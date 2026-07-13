@@ -1,17 +1,9 @@
--- -------------------------------------------------------------
--- USER
--- Passwort-Hash entspricht "password123" (BCrypt, cost 12)
--- -------------------------------------------------------------
 INSERT INTO "user" (id, firstname, lastname, email, password, created_at) VALUES
     ('4994802c-b652-4431-8b27-921e76093284', 'Max', 'Mustermann',  'max@example.com',    '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '30 days'),
     ('8b5d9619-0acb-457b-8594-ae20db513cdc', 'Lisa','Schneider',  'lisa@example.com',   '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '25 days'),
     ('28515cdb-370f-466f-bf95-e0042e07e540', 'Tom', 'Fischer',     'tom@example.com',    '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '20 days')
 ON CONFLICT (id) DO NOTHING;
 
-
--- -------------------------------------------------------------
--- LEAD  (10 Einträge, gemischte Status & Zuweisungen)
--- -------------------------------------------------------------
 INSERT INTO lead (id, firstname, lastname, company, phone, email, status, created_by, assigned_to, created_at, updated_at) VALUES
     ('02aaf375-cfd5-4d29-9315-7e186d08e8d2', 'Markus', 'Hoffmann', 'TechCorp GmbH',         '+49 30 1234567',   'hoffmann@mail.de', 'OPEN',        '4994802c-b652-4431-8b27-921e76093284', '4994802c-b652-4431-8b27-921e76093284', NOW() - INTERVAL '10 days', NOW() - INTERVAL '10 days'),
     ('f1f8312e-f94e-4dbc-b6b2-898af5c3c2b6', 'Sabine', 'Klein',    'Klein Logistik',        '+49 89 7654321',   'klein@mail.de',    'OPEN',        '4994802c-b652-4431-8b27-921e76093284', '8b5d9619-0acb-457b-8594-ae20db513cdc', NOW() - INTERVAL '9 days',  NOW() - INTERVAL '9 days'),
@@ -25,9 +17,6 @@ INSERT INTO lead (id, firstname, lastname, company, phone, email, status, create
     ('7de80d59-d795-4a8e-ac0b-17243aec64ac', 'Eva', 'Schulz',      'Schulz & Partner KG',   '+49 201 112233',   'schulz@mail.de',   'NOT_REACHED', '28515cdb-370f-466f-bf95-e0042e07e540', '8b5d9619-0acb-457b-8594-ae20db513cdc', NOW() - INTERVAL '1 day',   NOW() - INTERVAL '1 day')
 ON CONFLICT (id) DO NOTHING;
 
--- -------------------------------------------------------------
--- CALL_LOG  (Anrufversuche für ausgewählte Leads)
--- -------------------------------------------------------------
 INSERT INTO call_log (id, lead_id, user_id, result, notes, called_at) VALUES
     ('14859c53-e68a-44a7-b143-3c7ff7a6cae0', '806e1c0d-59b7-4725-b4a4-feaeacff9c6b', '8b5d9619-0acb-457b-8594-ae20db513cdc', 'REACHED',     'Hat zugesagt, meldet sich morgen.',         NOW() - INTERVAL '1 day'),
     ('fc399db7-0c9c-4f59-b8ee-2831b3a2b20a', '7ddc4d61-7118-4f20-8798-446c7406e431', '28515cdb-370f-466f-bf95-e0042e07e540', 'NOT_REACHED', 'Mailbox. Rückruf hinterlassen.',            NOW() - INTERVAL '2 days'),
@@ -37,9 +26,6 @@ INSERT INTO call_log (id, lead_id, user_id, result, notes, called_at) VALUES
     ('8bb2889d-c1b7-4a4c-9634-047e22b39fe4', '7de80d59-d795-4a8e-ac0b-17243aec64ac', '8b5d9619-0acb-457b-8594-ae20db513cdc', 'NOT_REACHED', 'Beschäftigt, bittet um Rückruf morgen.',    NOW() - INTERVAL '1 day')
 ON CONFLICT (id) DO NOTHING;
 
--- -------------------------------------------------------------
--- CSV_IMPORT  (ein Beispiel-Import)
--- -------------------------------------------------------------
 INSERT INTO csv_import (id, imported_by, row_count, imported_at) VALUES
     ('52b021d3-1ed6-4df2-a475-97ace96e7e2d', '4994802c-b652-4431-8b27-921e76093284', 10, NOW() - INTERVAL '10 days')
 ON CONFLICT (id) DO NOTHING;
