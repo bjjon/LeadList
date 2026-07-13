@@ -1,4 +1,4 @@
-name: sonar-cloud-backend
+name: backend
 on:
   push:
     branches:
@@ -33,4 +33,5 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        working-directory: backend
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=bjjon_LeadList_backend
