@@ -1,0 +1,17 @@
+### Login user
+POST {{localhost}}:{{port}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "max@example.com",
+  "password": "password123"
+}
+
+> {%
+  var res = response.body
+  client.global.set("token", res.accessToken)
+%}
+
+### Logout user
+POST {{localhost}}:{{port}}/api/auth/logout
+Authorization: Bearer {{token}}

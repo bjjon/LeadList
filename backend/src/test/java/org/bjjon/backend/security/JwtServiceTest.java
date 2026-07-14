@@ -49,13 +49,13 @@ class JwtServiceTest {
     @Test
     void validateToken_shouldReturnTrueForValidToken() {
         String token = jwtService.generateToken("test@example.com");
-        assertTrue(jwtService.validateToken(token));
+        assertTrue(jwtService.isValidToken(token));
     }
 
     @Test
-    void validateToken_shouldReturnFalseForTamperedToken() {
+    void validateToken_shouldReturnFalseForInvalidToken() {
         String token = jwtService.generateToken("test@example.com");
         String invalidToken = token.substring(0, token.length() - 2) + "xx";
-        assertFalse(jwtService.validateToken(invalidToken));
+        assertFalse(jwtService.isValidToken(invalidToken));
     }
 }
