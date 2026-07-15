@@ -1,6 +1,7 @@
 import './Sidebar.css';
 import { useAuthStore } from "../store/authStore.ts";
 import { logout as logoutRequest } from "../api/auth.ts";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   const toggleSidebar = () => {
@@ -51,6 +52,57 @@ export default function Sidebar() {
           </svg>
         </button>
       </div>
+
+      <nav className="sidebar-nav">
+        <div className="nav-section">
+          <span className="sb-text">Übersicht</span>
+        </div>
+        <NavLink
+          to="/"
+          end
+          className={({isActive}) => `nav-item${isActive ? " active" : ""}`}
+          title="Leads"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          <span className="sb-text">Leads</span>
+        </NavLink>
+        <div className="nav-section">
+          <span className="sb-text">Hinzufügen</span>
+        </div>
+        <NavLink
+          to="/add"
+          className={({ isActive }) => `nav-item${isActive ? " active" : ""}`}
+          title="Neuer Lead"
+        >
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.5"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          <span className="sb-text">Neuer Lead</span>
+        </NavLink>
+        <NavLink to="/csv" className="nav-item" title="CSV Import">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12V4m0 8l-3-3m3 3l3-3"
+            />
+          </svg>
+          <span className="sb-text">CSV Import</span>
+        </NavLink>
+      </nav>
 
       <div className="sidebar-user">
         <button id="logoutBtn" title="Abmelden" aria-label="Abmelden" onClick={handleLogout}>
