@@ -6,7 +6,7 @@ export default function Header() {
     <header className="main-header">
       <div>
         <h2 id="pageTitle">PAGE TITLE</h2>
-        <p id="pageSubtitle"> SUBTILE</p>
+        <p id="pageSubtitle">PAGE SUBTILE</p>
       </div>
     </header>
   )

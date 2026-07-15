@@ -1,10 +1,22 @@
 import './Sidebar.css';
+import { useAuthStore } from "../store/authStore.ts";
+import { logout as logoutRequest } from "../api/auth.ts";
 
 export default function Sidebar() {
   const toggleSidebar = () => {
     const sidebar = document.getElementById("sidebar")!;
     sidebar.classList.toggle("collapsed");
   };
+
+  const { user, logout } = useAuthStore();
+
+  async function handleLogout() {
+    try {
+      await logoutRequest();
+    } finally {
+      logout();
+    }
+  }
 
   return (
     <aside id="sidebar">
@@ -41,7 +53,7 @@ export default function Sidebar() {
       </div>
 
       <div className="sidebar-user">
-        <button id="logoutBtn" title="Abmelden" aria-label="Abmelden">
+        <button id="logoutBtn" title="Abmelden" aria-label="Abmelden" onClick={handleLogout}>
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -54,10 +66,10 @@ export default function Sidebar() {
         </button>
         <div className="user-chip">
           <div className="avatar" id="userAvatar">
-            mm
+            {user?.firstname.charAt(0)}{user?.lastname.charAt(0)}
           </div>
           <span id="userLabel" className="sb-text">
-              max muster
+              {user?.firstname} {user?.lastname}
           </span>
         </div>
       </div>
