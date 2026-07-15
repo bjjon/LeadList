@@ -35,6 +35,8 @@
     border: none;
     background: none;
     gap: unset;
+    padding: 0.375rem;
+    justify-content: center;
 }
 
 /* Nav-Items zentrieren wenn collapsed */
