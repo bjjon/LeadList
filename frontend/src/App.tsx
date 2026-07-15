@@ -1,9 +1,10 @@
 import './App.css'
+import Dashboard from "./pages/Dashboard.tsx";
 
 function App() {
 
   return (
-    <p>Under construction ...</p>
+    <Dashboard />
   )
 }
 
