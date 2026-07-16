@@ -1,0 +1,7 @@
+### GET all lead
+GET {{localhost}}:{{port}}/api/leads
+Authorization: Bearer {{token}}
+
+### Get all call-logs for a lead
+GET {{localhost}}:{{port}}/api/leads/{{id}}/call-logs
+Authorization: Bearer {{token}}

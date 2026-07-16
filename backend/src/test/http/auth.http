@@ -10,6 +10,7 @@ Content-Type: application/json
 > {%
   var res = response.body
   client.global.set("token", res.accessToken)
+  client.global.set("id", res.user.id)
 %}
 
 ### Logout user
