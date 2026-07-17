@@ -1,6 +1,11 @@
 import "./SearchBar.css";
 
-export default function SearchBar() {
+type SearchBarType = {
+  query: string;
+  onQueryChange: (q: string) => void;
+}
+
+export default function SearchBar({ query, onQueryChange }: Readonly<SearchBarType>) {
   return (
     <div className="leads-toolbar">
       <div className="search-bar">
@@ -13,6 +18,8 @@ export default function SearchBar() {
           <input
             type="text"
             className="search-input"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
           />
         </div>
       </div>

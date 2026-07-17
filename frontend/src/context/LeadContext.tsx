@@ -1,5 +1,5 @@
 import type { Lead } from "../types/Lead.ts";
-import {createContext, type ReactNode, useContext, useEffect, useState} from "react";
+import {createContext, type ReactNode, useContext, useState} from "react";
 import { api } from "../api/axiosInstance.ts";
 
 interface LeadContextType {
@@ -20,11 +20,6 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
       console.error(error);
     }
   }
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    getLeads().catch((err) => console.error(err));
-  }, []);
 
   return (
     <LeadContext.Provider value={{ leads, getLeads }} >
