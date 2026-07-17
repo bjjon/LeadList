@@ -13,15 +13,24 @@ type LeadDetailProps = {
 
 export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetailProps>) {
   const { user } = useAuthStore();
-  const { logs, getCallLogs } = useLeads();
+  const { logs, getCallLogs, assign, unassign } = useLeads();
 
   const isMine = lead?.assignedTo?.id === user?.id;
   const isLockedByOther = lead?.assignedTo && !isMine;
 
-  useEffect( () => {
+  useEffect(() => {
     if (!lead) return
     getCallLogs(lead.id);
-  }, [lead, getCallLogs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lead?.id]);
+
+  const handleUnassign = async (id: string) => {
+    await unassign(id);
+  }
+
+  const handleAssign = async (id: string) => {
+    await assign(id);
+  }
 
   function isMineOrOpenClass() {
     if (isMine) {
@@ -115,11 +124,11 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
 
                 {!isLockedByOther && (
                   isMine ? (
-                    <button className="btn-release">
+                    <button className="btn-release" onClick={() => handleUnassign(lead?.id)}>
                       Freigeben
                     </button>
                   ) : (
-                    <button className="btn-claim">
+                    <button className="btn-claim" onClick={() => handleAssign(lead?.id)}>
                       Mir zuweisen
                     </button>
                   )

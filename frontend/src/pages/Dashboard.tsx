@@ -11,8 +11,8 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    getLeads().catch(err => console.error(err));
-  }, [getLeads]);
+    getLeads();
+  }, []);
 
   const filteredLeads = useMemo(() => {
     const q = query.trim().toLowerCase();

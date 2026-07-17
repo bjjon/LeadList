@@ -10,10 +10,12 @@ type LeadListProps = {
 
 export default function LeadList({ leads }: Readonly<LeadListProps>) {
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+
+  const selectedLead = leads.find((lead) => lead.id === selectedLeadId) ?? null;
 
   const openDetail = useCallback((lead: Lead) => {
-    setSelectedLead(lead);
+    setSelectedLeadId(lead.id);
     setIsDetailOpen(true);
   }, []);
 

@@ -8,6 +8,8 @@ interface LeadContextType {
   getLeads: () => Promise<void>,
   logs: CallLog[],
   getCallLogs: (id: string) => Promise<void>,
+  assign: (id: string) => Promise<void>;
+  unassign: (id: string) => Promise<void>;
 }
 
 const LeadContext = createContext<LeadContextType | null>(null);
@@ -34,8 +36,27 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
     }
   }
 
+  const assign = async (id: string) => {
+    try {
+      const res = await api.put<Lead>(`/leads/${id}/assign`);
+      setLeads(prev => prev.map(lead => lead.id === id ? res.data : lead));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const unassign = async (id: string) => {
+    try {
+      const res = await api.put<Lead>(`/leads/${id}/unassign`);
+      setLeads(prev => prev.map(lead => lead.id === id ? res.data : lead));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+
   return (
-    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs }} >
+    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign }} >
       {children}
     </LeadContext.Provider>
   )
