@@ -3,7 +3,6 @@ import type { Lead } from "../types/Lead.ts";
 import LeadRow from "./LeadRow.tsx";
 import LeadDetail from "./LeadDetail.tsx";
 import { useCallback, useState } from "react";
-import useOutsideClick from "../hooks/OutsideClick.ts";
 
 type LeadListProps = {
   leads: Lead[];
@@ -13,11 +12,6 @@ export default function LeadList({ leads }: Readonly<LeadListProps>) {
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
-  const ref = useOutsideClick(() => {
-    setIsDetailOpen(false);
-    setSelectedLead(null);
-  });
-
   const openDetail = useCallback((lead: Lead) => {
     setSelectedLead(lead);
     setIsDetailOpen(true);
@@ -25,11 +19,10 @@ export default function LeadList({ leads }: Readonly<LeadListProps>) {
 
   const closeDetail = useCallback(() => {
     setIsDetailOpen(false);
-    setSelectedLead(null);
   }, []);
 
   return (
-    <div className="leads-list fade-in" ref={ref}>
+    <div className="leads-list fade-in">
       <div id="leadList">
         {leads.length === 0 ? (
           <p
@@ -47,12 +40,11 @@ export default function LeadList({ leads }: Readonly<LeadListProps>) {
           ))
         )}
       </div>
-      {selectedLead && <LeadDetail
-        key={selectedLead.id}
+      <LeadDetail
         lead={selectedLead}
         isOpen={isDetailOpen}
         onClose={closeDetail}
-      />}
+      />
     </div>
   )
 }
