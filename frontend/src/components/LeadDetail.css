@@ -1,0 +1,87 @@
+/* ── Assignment block (separate from status) ── */
+.assign-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--ink-800);
+    border: 1px solid var(--ink-700);
+}
+
+.assign-block--me {
+    background: rgba(125, 211, 252, 0.05);
+    border-color: rgba(125, 211, 252, 0.25);
+}
+
+.assign-block--locked {
+    background: rgba(251, 191, 36, 0.05);
+    border-color: rgba(251, 191, 36, 0.2);
+}
+
+.assign-block-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.assign-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+
+.assign-icon--me {
+    color: var(--accent);
+}
+
+.assign-icon--lock {
+    color: var(--accent-warm);
+}
+
+.assign-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.assign-block--locked .assign-label {
+    color: var(--accent-warm);
+}
+
+.assign-block--me .assign-label {
+    color: var(--accent);
+}
+
+.assign-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.125rem;
+}
+
+.assign-sub span {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* lock-badge kept for LeadRow usage */
+.lock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--accent-warm);
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+}
+
+.lock-badge svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+}
