@@ -1,23 +1,24 @@
 package org.bjjon.backend.controller;
 
 import org.bjjon.backend.TestcontainersConfiguration;
+import org.bjjon.backend.config.WithMockUserSupportConfig;
 import org.bjjon.backend.dto.auth.LoginResponse;
 import org.bjjon.backend.dto.user.UserResponse;
 import org.bjjon.backend.entity.User;
 import org.bjjon.backend.exception.auth.AuthException;
-import org.bjjon.backend.repository.UserRepo;
-import org.bjjon.backend.security.JwtService;
 import org.bjjon.backend.service.AuthService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,47 +35,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, WithMockUserSupportConfig.class})
 class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepo userRepo;
-
-    @Autowired
-    private JwtService jwtService;
 
     @MockitoBean
     private AuthService authService;
 
     private static final String EMAIL = "test@email.com";
     private static final String RAW_PASSWORD = "password123";
-
-    private User testUser;
-
-    @AfterEach
-    void cleanUp() {
-        if (testUser != null) {
-            userRepo.deleteById(testUser.getId());
-            testUser = null;
-        }
-    }
-
-    private String createAuthenticatedUserAndGetToken() {
-        String email = "auth-controller-" + UUID.randomUUID() + "@example.com";
-        testUser = userRepo.save(User.builder()
-                .firstname("Max")
-                .lastname("Mustermann")
-                .email(email)
-                .password("my-secret-password")
-                .build());
-        String token = jwtService.generateToken(email);
-        testUser.setToken(token);
-        userRepo.save(testUser);
-        return token;
-    }
 
     @Test
     void login_validRequest_returns200WithLoginResponse() throws Exception {
@@ -114,11 +86,18 @@ class AuthControllerTest {
     }
 
     @Test
+    @WithMockUser
     void logout_authenticatedUser_returns200() throws Exception {
-        String token = createAuthenticatedUserAndGetToken();
+        User testUser = User.builder()
+                .id(UUID.randomUUID())
+                .firstname("Max")
+                .lastname("Mustermann")
+                .email("auth-controller-" + UUID.randomUUID() + "@example.com")
+                .password("my-secret-password")
+                .build();
 
         mockMvc.perform(post("/api/auth/logout")
-                        .header("Authorization", "Bearer " + token))
+                        .with(authentication(new UsernamePasswordAuthenticationToken(testUser, null, List.of()))))
                 .andExpect(status().isOk());
 
         verify(authService).logout(argThat(user -> user.getId().equals(testUser.getId())));
