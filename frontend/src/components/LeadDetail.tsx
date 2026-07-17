@@ -1,6 +1,9 @@
 import "./LeadDetail.css";
 import type { Lead } from "../types/Lead.ts";
 import { useAuthStore } from "../store/authStore.ts";
+import { useLeads } from "../context/LeadContext.tsx";
+import { useEffect } from "react";
+import FormatToLocalTime from "../utils/FormatToLocalTime.ts";
 
 type LeadDetailProps = {
   lead: Lead | null;
@@ -10,9 +13,15 @@ type LeadDetailProps = {
 
 export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetailProps>) {
   const { user } = useAuthStore();
+  const { logs, getCallLogs } = useLeads();
 
   const isMine = lead?.assignedTo?.id === user?.id;
   const isLockedByOther = lead?.assignedTo && !isMine;
+
+  useEffect( () => {
+    if (!lead) return
+    getCallLogs(lead.id);
+  }, [lead, getCallLogs]);
 
   function isMineOrOpenClass() {
     if (isMine) {
@@ -166,16 +175,21 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
               {/* ── Verlauf ── */}
               <div className="history-section">
                 <p className="history-label">Verlauf</p>
-                <ul className="history-list">
-                  <li className="history-item">
-                    <span className="history-time">25.05., 17:45</span>
-                    <span>Anna Berger hat den Lead übernommen.</span>
-                  </li>
-                  <li className="history-item">
-                    <span className="history-time">17.05., 07:19</span>
-                    <span>Anna Berger hat den Lead freigegeben.</span>
-                  </li>
-                </ul>
+                {logs.length === 0 ? (
+                  <p className="history-empty">Noch kein Verlauf vorhanden.</p>
+                ) : (
+                  <ul className="history-list">
+                    {logs.map((log) => (
+                      <li key={`${log.userId}-${log.calledAt}`} className="history-item">
+                        <span className="history-time">{FormatToLocalTime(log.calledAt)}</span>
+                        <span>
+                          {log.result === "REACHED" ? "Als erreicht markiert." : "Als nicht erreicht markiert."}
+                          {log.notes ? ` „${log.notes}“` : ""}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </div>
