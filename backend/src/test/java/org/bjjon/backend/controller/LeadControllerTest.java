@@ -1,12 +1,15 @@
 package org.bjjon.backend.controller;
 
 import org.bjjon.backend.TestcontainersConfiguration;
+import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
 import org.bjjon.backend.dto.lead.LeadResponse;
+import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
 import org.bjjon.backend.entity.Status;
 import org.bjjon.backend.entity.User;
 import org.bjjon.backend.config.WithMockUserSupportConfig;
+import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.service.LeadService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,11 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,11 +31,13 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +50,9 @@ class LeadControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private LeadService leadService;
@@ -232,5 +242,68 @@ class LeadControllerTest {
                 .andExpect(status().isUnauthorized());
 
         verify(leadService, never()).unassign(any());
+    }
+
+    @Test
+    void logCall_authenticatedUserAssigned_returns200WithLeadResponse() throws Exception {
+        lead1.setAssignedTo(user);
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "Kunde erreicht");
+        when(leadService.logCall(eq(user), eq(lead1.getId()), any(CallLogRequest.class)))
+                .thenReturn(LeadResponse.fromEntity(lead1));
+
+        mockMvc.perform(post("/api/leads/{id}/call-logs", lead1.getId())
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(lead1.getId().toString()))
+                .andExpect(jsonPath("$.status.value").value("OPEN"));
+    }
+
+    @Test
+    void logCall_invalidUuidPathVariable_returns400() throws Exception {
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "");
+
+        mockMvc.perform(post("/api/leads/{id}/call-logs", "not-a-uuid")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void logCall_unauthenticated_returns401() throws Exception {
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "");
+
+        mockMvc.perform(post("/api/leads/{id}/call-logs", lead1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+
+        verify(leadService, never()).logCall(any(), any(), any());
+    }
+
+    @Test
+    @WithMockUser
+    void logCall_missingResult_returns400() throws Exception {
+        mockMvc.perform(post("/api/leads/{id}/call-logs", lead1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"notes\": \"Kunde erreicht\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(leadService, never()).logCall(any(), any(), any());
+    }
+
+    @Test
+    void logCall_notAssignedToUser_returns403() throws Exception {
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "");
+        when(leadService.logCall(eq(user), eq(lead1.getId()), any(CallLogRequest.class)))
+                .thenThrow(new LeadNotAssignedException(lead1.getId()));
+
+        mockMvc.perform(post("/api/leads/{id}/call-logs", lead1.getId())
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
     }
 }

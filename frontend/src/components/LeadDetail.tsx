@@ -2,7 +2,7 @@ import "./LeadDetail.css";
 import type { Lead } from "../types/Lead.ts";
 import { useAuthStore } from "../store/authStore.ts";
 import { useLeads } from "../context/LeadContext.tsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import formatInstantTime from "../utils/formatToLocalTime.ts";
 
 type LeadDetailProps = {
@@ -12,8 +12,10 @@ type LeadDetailProps = {
 };
 
 export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetailProps>) {
+  const [note, setNote] = useState<string>("");
+
   const { user } = useAuthStore();
-  const { logs, getCallLogs, assign, unassign } = useLeads();
+  const { logs, getCallLogs, assign, unassign, logCall } = useLeads();
 
   const isMine = lead?.assignedTo?.id === user?.id;
   const isLockedByOther = lead?.assignedTo && !isMine;
@@ -30,6 +32,10 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
 
   const handleAssign = async (id: string) => {
     await assign(id);
+  }
+
+  const handleLogCall = async (id: string, result: string) => {
+    await logCall(id, { result, notes: note });
   }
 
   function isMineOrOpenClass() {
@@ -124,11 +130,11 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
 
                 {!isLockedByOther && (
                   isMine ? (
-                    <button className="btn-release" onClick={() => handleUnassign(lead?.id)}>
+                    <button className="btn-release" onClick={() => handleUnassign(lead.id)}>
                       Freigeben
                     </button>
                   ) : (
-                    <button className="btn-claim" onClick={() => handleAssign(lead?.id)}>
+                    <button className="btn-claim" onClick={() => handleAssign(lead.id)}>
                       Mir zuweisen
                     </button>
                   )
@@ -158,6 +164,8 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
                   className="note-input"
                   disabled={!isMine}
                   rows={3}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
                   placeholder={isMine ? "Notiz eingeben …" : ""}
                 />
               </div>
@@ -169,12 +177,14 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
                   <button
                     className={`reach-btn${lead.status.value === "REACHED" ? " active-ok" : ""}`}
                     disabled={!isMine}
+                    onClick={() => handleLogCall(lead.id, "REACHED")}
                   >
                     ✓ Erreicht
                   </button>
                   <button
                     className={`reach-btn reach-no${lead.status.value === "NOT_REACHED" ? " active-no" : ""}`}
                     disabled={!isMine}
+                    onClick={() => handleLogCall(lead.id, "NOT_REACHED")}
                   >
                     ✕ Nicht erreicht
                   </button>

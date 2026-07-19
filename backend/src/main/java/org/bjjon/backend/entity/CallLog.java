@@ -55,8 +55,6 @@ public class CallLog {
     private Instant calledAt;
 
     public enum CallResult {
-        OPEN,
-        IN_PROGRESS,
         REACHED,
         NOT_REACHED
     }

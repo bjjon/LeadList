@@ -1,5 +1,7 @@
 package org.bjjon.backend.controller;
 
+import jakarta.validation.Valid;
+import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.User;
@@ -38,5 +40,10 @@ public class LeadController {
     @PutMapping("/{id}/unassign")
     public LeadResponse unassign(@PathVariable UUID id) {
         return leadService.unassign(id);
+    }
+
+    @PostMapping("/{id}/call-logs")
+    public LeadResponse createCallLog(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody CallLogRequest callLogRequest) {
+        return leadService.logCall(user, id, callLogRequest);
     }
 }

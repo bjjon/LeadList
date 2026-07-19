@@ -1,11 +1,13 @@
 package org.bjjon.backend.service;
 
+import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
 import org.bjjon.backend.entity.Status;
 import org.bjjon.backend.entity.User;
+import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.bjjon.backend.repository.CallLogRepo;
 import org.bjjon.backend.repository.LeadRepo;
@@ -13,6 +15,7 @@ import org.bjjon.backend.repository.StatusRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -262,5 +265,67 @@ class LeadServiceTest {
         when(leadRepo.findById(unknownId)).thenReturn(Optional.empty());
 
         assertThrows(LeadNotFountException.class, () -> leadService.unassign(unknownId));
+    }
+
+    @Test
+    void logCall_existingLeadAssignedToUser_setsStatusAndSavesCallLog() {
+        Status reachedStatus = Status.builder()
+                .value("REACHED")
+                .label("Erreicht")
+                .color("#22c55e")
+                .build();
+        lead1.setAssignedTo(user);
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "Kunde erreicht, Rückruf vereinbart");
+
+        when(leadRepo.findById(lead1.getId())).thenReturn(Optional.of(lead1));
+        when(statusRepo.findStatusByValue("REACHED")).thenReturn(reachedStatus);
+
+        leadService.logCall(user, lead1.getId(), request);
+
+        assertEquals("REACHED", lead1.getStatus().getValue());
+        ArgumentCaptor<CallLog> callLogCaptor = ArgumentCaptor.forClass(CallLog.class);
+        verify(callLogRepo).save(callLogCaptor.capture());
+        CallLog savedCallLog = callLogCaptor.getValue();
+        assertEquals(lead1, savedCallLog.getLead());
+        assertEquals(user, savedCallLog.getUser());
+        assertEquals(CallLog.CallResult.REACHED, savedCallLog.getResult());
+        assertEquals("Kunde erreicht, Rückruf vereinbart", savedCallLog.getNotes());
+    }
+
+    @Test
+    void logCall_existingLeadAssignedToUser_returnsMappedLeadResponse() {
+        Status notReachedStatus = Status.builder()
+                .value("NOT_REACHED")
+                .label("Nicht erreicht")
+                .color("#ef4444")
+                .build();
+        lead1.setAssignedTo(user);
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.NOT_REACHED, "Mailbox erreicht");
+
+        when(leadRepo.findById(lead1.getId())).thenReturn(Optional.of(lead1));
+        when(statusRepo.findStatusByValue("NOT_REACHED")).thenReturn(notReachedStatus);
+
+        LeadResponse result = leadService.logCall(user, lead1.getId(), request);
+
+        assertEquals(lead1.getId(), result.id());
+        assertEquals("NOT_REACHED", result.status().value());
+    }
+
+    @Test
+    void logCall_leadNotFound_throwsLeadNotFountException() {
+        UUID unknownId = UUID.randomUUID();
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "");
+        when(leadRepo.findById(unknownId)).thenReturn(Optional.empty());
+
+        assertThrows(LeadNotFountException.class, () -> leadService.logCall(user, unknownId, request));
+    }
+
+    @Test
+    void logCall_leadNotAssignedToUser_throwsLeadNotAssignedException() {
+        UUID leadId = lead1.getId();
+        CallLogRequest request = new CallLogRequest(CallLog.CallResult.REACHED, "");
+        when(leadRepo.findById(leadId)).thenReturn(Optional.of(lead1));
+
+        assertThrows(LeadNotAssignedException.class, () -> leadService.logCall(user, leadId, request));
     }
 }

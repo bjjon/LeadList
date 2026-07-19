@@ -10,6 +10,7 @@ interface LeadContextType {
   getCallLogs: (id: string) => Promise<void>,
   assign: (id: string) => Promise<void>;
   unassign: (id: string) => Promise<void>;
+  logCall: (id: string, payload: { result: string, notes: string }) => Promise<void>;
 }
 
 const LeadContext = createContext<LeadContextType | null>(null);
@@ -38,25 +39,35 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const assign = async (id: string) => {
     try {
-      const res = await api.put<Lead>(`/leads/${id}/assign`);
-      setLeads(prev => prev.map(lead => lead.id === id ? res.data : lead));
-    } catch (err) {
-      console.error(err);
+      const { data } = await api.put<Lead>(`/leads/${id}/assign`);
+      setLeads(prev => prev.map(lead => lead.id === id ? data : lead));
+    } catch (error) {
+      console.error(error);
     }
   }
 
   const unassign = async (id: string) => {
     try {
-      const res = await api.put<Lead>(`/leads/${id}/unassign`);
-      setLeads(prev => prev.map(lead => lead.id === id ? res.data : lead));
-    } catch (err) {
-      console.error(err);
+      const { data } = await api.put<Lead>(`/leads/${id}/unassign`);
+      setLeads(prev => prev.map(lead => lead.id === id ? data : lead));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const logCall = async (id: string, payload: { result: string, notes: string }) => {
+    try {
+      const { data } =  await api.post<Lead>(`/leads/${id}/call-logs`, payload);
+      setLeads(prev => prev.map(lead => lead.id === id ? data : lead));
+      await getCallLogs(id);
+    } catch (error) {
+      console.error(error);
     }
   }
 
 
   return (
-    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign }} >
+    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall }} >
       {children}
     </LeadContext.Provider>
   )

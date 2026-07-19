@@ -1,6 +1,8 @@
 package org.bjjon.backend.exception;
 
 import org.bjjon.backend.exception.auth.AuthException;
+import org.bjjon.backend.exception.lead.LeadNotAssignedException;
+import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +35,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorMessage handleAuthException(AuthException ex) {
         return new ErrorMessage(ex.getMessage(), HttpStatus.UNAUTHORIZED.value(), Instant.now());
+    }
+
+    @ExceptionHandler(LeadNotFountException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorMessage handleLeadNotFountException(LeadNotFountException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.NOT_FOUND.value(), Instant.now());
+    }
+
+    @ExceptionHandler(LeadNotAssignedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorMessage handleLeadNotAssignedException(LeadNotAssignedException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.FORBIDDEN.value(), Instant.now());
     }
 
     // todo - for testing populate message
