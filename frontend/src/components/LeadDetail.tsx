@@ -3,7 +3,7 @@ import type { Lead } from "../types/Lead.ts";
 import { useAuthStore } from "../store/authStore.ts";
 import { useLeads } from "../context/LeadContext.tsx";
 import { useEffect } from "react";
-import FormatToLocalTime from "../utils/FormatToLocalTime.ts";
+import formatInstantTime from "../utils/formatToLocalTime.ts";
 
 type LeadDetailProps = {
   lead: Lead | null;
@@ -190,7 +190,7 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
                   <ul className="history-list">
                     {logs.map((log) => (
                       <li key={`${log.userId}-${log.calledAt}`} className="history-item">
-                        <span className="history-time">{FormatToLocalTime(log.calledAt)}</span>
+                        <span className="history-time">{formatInstantTime(log.calledAt)}</span>
                         <span>
                           {log.result === "REACHED" ? "Als erreicht markiert." : "Als nicht erreicht markiert."}
                           {log.notes ? ` „${log.notes}“` : ""}
