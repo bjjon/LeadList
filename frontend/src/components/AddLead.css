@@ -1,0 +1,90 @@
+.page-inner {
+    padding: 2rem 1.5rem;
+}
+.card {
+    background: rgba(15, 17, 23, 0.8);
+    border: 1px solid var(--ink-700);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+.card-head {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--ink-700);
+}
+.card-head h3 {
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+.card-head p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+.card-body {
+    padding: 1.5rem;
+}
+.field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+@media (max-width: 540px) {
+    .field-grid {
+        grid-template-columns: 1fr;
+    }
+}
+#addSuccess {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--accent-ok);
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 1rem;
+}
+#addSuccess svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+.btn-row {
+    display: flex;
+    gap: 0.75rem;
+}
+.btn-accent {
+    flex: 1;
+    background: var(--accent);
+    color: var(--ink-950);
+    font-weight: 600;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: opacity 0.15s;
+}
+.btn-accent:hover {
+    opacity: 0.9;
+}
+.btn-accent svg {
+    width: 1rem;
+    height: 1rem;
+}
+.btn-ghost {
+    padding: 0.625rem 1.25rem;
+    background: var(--ink-800);
+    border: 1px solid var(--ink-700);
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: border-color 0.15s;
+}
+.btn-ghost:hover {
+    border-color: var(--ink-600);
+}
