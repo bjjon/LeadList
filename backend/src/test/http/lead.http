@@ -5,3 +5,17 @@ Authorization: Bearer {{token}}
 ### Get all call-logs for a lead
 GET {{localhost}}:{{port}}/api/leads/{{id}}/call-logs
 Authorization: Bearer {{token}}
+
+### Add new lead to list
+POST {{localhost}}:{{port}}/api/leads/add
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstname": "Max",
+  "lastname": "Mustermann",
+  "company": "Muster GmbH",
+  "phone": "+47 179 222 666",
+  "note": "",
+  "email": "max@muster.de"
+}

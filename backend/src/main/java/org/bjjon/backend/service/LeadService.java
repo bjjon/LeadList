@@ -2,6 +2,7 @@ package org.bjjon.backend.service;
 
 import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
+import org.bjjon.backend.dto.lead.LeadRequest;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
@@ -33,7 +34,7 @@ public class LeadService {
     public List<LeadResponse> getAll() {
         return leadRepo.findAll().stream()
                 .map(LeadResponse::fromEntity)
-                .sorted(Comparator.comparing(LeadResponse::lastname))
+                .sorted(Comparator.comparing(LeadResponse::createdAt).reversed())
                 .toList();
     }
 
@@ -82,5 +83,23 @@ public class LeadService {
         leadRepo.save(lead);
 
         return LeadResponse.fromEntity(lead);
+    }
+
+    public LeadResponse addLead(User user, LeadRequest leadRequest) {
+
+        Lead newLead = new Lead();
+
+        newLead.setFirstname(leadRequest.firstname());
+        newLead.setLastname(leadRequest.lastname());
+        newLead.setCompany(leadRequest.company());
+        newLead.setEmail(leadRequest.email());
+        newLead.setCreatedBy(user);
+        newLead.setStatus(statusRepo.findStatusByValue("OPEN"));
+        newLead.setPhone(leadRequest.phone());
+        newLead.setNote(leadRequest.note());
+
+        leadRepo.save(newLead);
+
+        return LeadResponse.fromEntity(newLead);
     }
 }
