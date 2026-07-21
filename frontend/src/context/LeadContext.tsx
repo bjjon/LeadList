@@ -2,6 +2,7 @@ import type { Lead } from "../types/Lead.ts";
 import {createContext, type ReactNode, useContext, useState} from "react";
 import { api } from "../api/axiosInstance.ts";
 import type { CallLog } from "../types/CallLog.ts";
+import type { LeadFormValues } from "../schemas/leadFormSchema.ts";
 
 interface LeadContextType {
   leads: Lead[],
@@ -11,6 +12,7 @@ interface LeadContextType {
   assign: (id: string) => Promise<void>;
   unassign: (id: string) => Promise<void>;
   logCall: (id: string, payload: { result: string, notes: string }) => Promise<void>;
+  addLead: (payload: LeadFormValues) => Promise<void>;
 }
 
 const LeadContext = createContext<LeadContextType | null>(null);
@@ -65,9 +67,18 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
     }
   }
 
+  const addLead = async (payload: LeadFormValues) => {
+    try {
+      const { data } =  await api.post<Lead>('leads/add', payload);
+      setLeads(prev => [data, ...prev]);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
 
   return (
-    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall }} >
+    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall, addLead }} >
       {children}
     </LeadContext.Provider>
   )
