@@ -2,6 +2,7 @@ package org.bjjon.backend.service;
 
 import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
+import org.bjjon.backend.dto.lead.LeadRequest;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
@@ -104,8 +105,8 @@ class LeadServiceTest {
         List<LeadResponse> result = leadService.getAll();
 
         assertEquals(2, result.size());
-        assertEquals("Bauer", result.get(0).lastname());
-        assertEquals("Fischer", result.get(1).lastname());
+        assertEquals("Bauer", result.get(1).lastname());
+        assertEquals("Fischer", result.get(0).lastname());
     }
 
     @Test
@@ -327,5 +328,41 @@ class LeadServiceTest {
         when(leadRepo.findById(leadId)).thenReturn(Optional.of(lead1));
 
         assertThrows(LeadNotAssignedException.class, () -> leadService.logCall(user, leadId, request));
+    }
+
+    @Test
+    void addLead_validRequest_setsStatusOpenAndCreatedBy() {
+        Status openStatus = Status.builder()
+                .value("OPEN")
+                .label("Offen")
+                .color("#64748b")
+                .build();
+        when(statusRepo.findStatusByValue("OPEN")).thenReturn(openStatus);
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+
+        LeadResponse leadResponse = leadService.addLead(user, leadRequest);
+
+        assertEquals(user.getId(), leadResponse.createdBy().id());
+        assertEquals("OPEN", leadResponse.status().value());
+    }
+
+    @Test
+    void addLead_validRequest_returnsMappedLeadResponse() {
+        Status openStatus = Status.builder()
+                .value("OPEN")
+                .label("Offen")
+                .color("#64748b")
+                .build();
+        when(statusRepo.findStatusByValue("OPEN")).thenReturn(openStatus);
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+
+        LeadResponse leadResponse = leadService.addLead(user, leadRequest);
+
+        assertEquals(leadRequest.firstname(), leadResponse.firstname());
+        assertEquals(leadRequest.lastname(), leadResponse.lastname());
+        assertEquals(leadRequest.company(), leadResponse.company());
+        assertEquals(leadRequest.phone(), leadResponse.phone());
+        assertEquals(leadRequest.email(), leadResponse.email());
+        assertEquals(leadRequest.note(), leadResponse.note());
     }
 }

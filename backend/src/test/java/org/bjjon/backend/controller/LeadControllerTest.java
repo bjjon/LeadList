@@ -3,6 +3,7 @@ package org.bjjon.backend.controller;
 import org.bjjon.backend.TestcontainersConfiguration;
 import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
+import org.bjjon.backend.dto.lead.LeadRequest;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
@@ -305,5 +306,76 @@ class LeadControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void addLead_authenticatedUser_returns200WithLeadResponse() throws Exception {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+        Status openStatus = Status.builder()
+                .value("OPEN")
+                .label("Offen")
+                .color("#64748b")
+                .build();
+        Lead createdLead = Lead.builder()
+                .id(UUID.randomUUID())
+                .firstname(leadRequest.firstname())
+                .lastname(leadRequest.lastname())
+                .company(leadRequest.company())
+                .phone(leadRequest.phone())
+                .email(leadRequest.email())
+                .note(leadRequest.note())
+                .status(openStatus)
+                .createdBy(user)
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
+        when(leadService.addLead(eq(user), any(LeadRequest.class))).thenReturn(LeadResponse.fromEntity(createdLead));
+
+        mockMvc.perform(post("/api/leads/add")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(leadRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstname").value("Max"))
+                .andExpect(jsonPath("$.lastname").value("Mustermann"))
+                .andExpect(jsonPath("$.company").value("Muster GmbH"))
+                .andExpect(jsonPath("$.status.value").value("OPEN"))
+                .andExpect(jsonPath("$.createdBy.id").value(user.getId().toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void addLead_missingRequiredField_returns400() throws Exception {
+        mockMvc.perform(post("/api/leads/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lastname\": \"Mustermann\", \"company\": \"Muster GmbH\", \"phone\": \"+49 179 223 223\", \"email\": \"max@mail.de\", \"note\": \"\"}"))
+                .andExpect(status().isBadRequest());
+
+        verify(leadService, never()).addLead(any(), any());
+    }
+
+    @Test
+    @WithMockUser
+    void addLead_invalidEmail_returns400() throws Exception {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "not-an-email", "");
+
+        mockMvc.perform(post("/api/leads/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(leadRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(leadService, never()).addLead(any(), any());
+    }
+
+    @Test
+    void addLead_unauthenticated_returns401() throws Exception {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+
+        mockMvc.perform(post("/api/leads/add")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(leadRequest)))
+                .andExpect(status().isUnauthorized());
+
+        verify(leadService, never()).addLead(any(), any());
     }
 }
