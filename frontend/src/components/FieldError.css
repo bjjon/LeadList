@@ -1,0 +1,18 @@
+.field-error {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    color: var(--accent-danger);
+    background: rgba(248, 113, 113, 0.08);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.625rem;
+    margin-top: 0.4rem;
+}
+
+.field-error svg {
+    width: 0.8125rem;
+    height: 0.8125rem;
+    flex-shrink: 0;
+}

@@ -5,6 +5,7 @@ import LeadList from "../components/LeadList.tsx";
 import { Route, Routes } from "react-router-dom";
 import SearchBar from "../components/SearchBar.tsx";
 import {useEffect, useMemo, useState} from "react";
+import AddLead from "../components/AddLead.tsx";
 
 export default function Dashboard() {
   const { leads, getLeads } = useLeads();
@@ -40,6 +41,7 @@ export default function Dashboard() {
               <LeadList leads={filteredLeads} />
             </>
           } />
+          <Route path={"/add"} element={<AddLead />} />
         </Routes>
       </div>
     </div>

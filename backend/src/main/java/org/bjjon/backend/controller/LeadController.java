@@ -3,6 +3,7 @@ package org.bjjon.backend.controller;
 import jakarta.validation.Valid;
 import org.bjjon.backend.dto.calllog.CallLogRequest;
 import org.bjjon.backend.dto.calllog.CallLogResponse;
+import org.bjjon.backend.dto.lead.LeadRequest;
 import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.User;
 import org.bjjon.backend.service.LeadService;
@@ -45,5 +46,10 @@ public class LeadController {
     @PostMapping("/{id}/call-logs")
     public LeadResponse createCallLog(@AuthenticationPrincipal User user, @PathVariable UUID id, @Valid @RequestBody CallLogRequest callLogRequest) {
         return leadService.logCall(user, id, callLogRequest);
+    }
+
+    @PostMapping("/add")
+    public LeadResponse addLead(@AuthenticationPrincipal User user, @Valid @RequestBody LeadRequest leadRequest) {
+        return leadService.addLead(user, leadRequest);
     }
 }
