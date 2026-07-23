@@ -23,3 +23,12 @@ export type Lead = {
   assignedTo: LeadUser;
   createdAt: string;
 };
+
+export type LeadRequest = {
+  firstname: string;
+  lastname: string;
+  company: string;
+  phone: string;
+  email: string;
+  note: string;
+};

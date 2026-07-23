@@ -1,0 +1,203 @@
+.drop-zone {
+    border: 2px dashed var(--ink-600);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition:
+            border-color 0.2s,
+            background 0.2s;
+}
+.drop-zone:hover,
+.drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(125, 211, 252, 0.04);
+}
+.drop-zone.drop-zone--danger {
+    border-color: var(--accent-danger);
+    background: rgba(248, 113, 113, 0.04);
+}
+.drop-icon {
+    display: inline-flex;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.75rem;
+    background: var(--ink-800);
+    border: 1px solid var(--ink-700);
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+}
+.drop-icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+.drop-zone p {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.drop-zone p + p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+.drop-zone small {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-500);
+    display: block;
+    margin-top: 0.5rem;
+}
+#csvPreviewPanel {
+    background: rgba(15, 17, 23, 0.8);
+    border: 1px solid var(--ink-700);
+    border-radius: 1rem;
+    overflow: hidden;
+}
+.csv-panel-head {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--ink-700);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+#csvFileName {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+#csvInfo {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+.btn-import {
+    background: var(--accent);
+    color: var(--ink-950);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+}
+.btn-import:hover {
+    opacity: 0.9;
+}
+.btn-import:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.csv-row-list {
+    list-style: none;
+    max-height: 16rem;
+    overflow-y: auto;
+}
+.csv-row-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--ink-700);
+}
+.csv-row-status:last-child {
+    border-bottom: none;
+}
+.csv-row-status span:first-child {
+    color: var(--text-secondary);
+}
+.csv-row-status span:last-child {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    white-space: nowrap;
+    text-align: right;
+}
+.csv-row-status--pending span:last-child {
+    color: var(--text-muted);
+}
+.csv-row-status--sending span:last-child {
+    color: var(--accent);
+}
+.csv-row-status--success span:last-child {
+    color: var(--accent-ok);
+}
+.csv-row-status--error span:last-child {
+    color: var(--accent-danger);
+}
+.btn-remove {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: color 0.15s;
+}
+.btn-remove:hover {
+    color: var(--accent-danger);
+}
+.btn-remove svg {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+.csv-map-section {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--ink-700);
+}
+.csv-map-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+#csvMapping {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+@media (max-width: 600px) {
+    #csvMapping {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.csv-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--ink-700);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.csv-hint {
+    background: rgba(15, 17, 23, 0.6);
+    border: 1px solid var(--ink-700);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+}
+.csv-hint-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+.csv-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: var(--ink-800);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    line-height: 1.7;
+}
+.csv-hint p {
+    font-size: 0.75rem;
+    color: var(--ink-500);
+    margin-top: 0.75rem;
+}

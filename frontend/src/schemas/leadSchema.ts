@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const leadFormSchema = z.object({
+export const leadSchema = z.object({
   firstname: z.string().trim().min(1, "Vorname darf nicht leer sein"),
   lastname: z.string().trim().min(1, "Nachname darf nicht leer sein"),
   company: z.string().trim().min(1, "Firma darf nicht leer sein"),
@@ -9,4 +9,4 @@ export const leadFormSchema = z.object({
   note: z.string(),
 });
 
-export type LeadFormValues = z.infer<typeof leadFormSchema>;
+export type LeadFormValues = z.infer<typeof leadSchema>;
