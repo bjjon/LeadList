@@ -2,11 +2,13 @@ import type { Lead, LeadRequest } from "../types/Lead.ts";
 import { api } from "../api/axiosInstance.ts";
 import { useState } from "react";
 import { useLeads } from "../context/LeadContext.tsx";
+import { leadSchema } from "../schemas/leadSchema.ts";
 
 export type CsvRowResult =
   | { status: "sending"; leadRequest: LeadRequest }
   | { status: "success"; lead: Lead }
-  | { status: "error"; leadRequest: LeadRequest };
+  | { status: "error"; leadRequest: LeadRequest; reason: "validation"; messages: string[] }
+  | { status: "error"; leadRequest: LeadRequest; reason: "server" };
 
 const LEAD_FIELDS: (keyof LeadRequest)[] = ["firstname", "lastname", "company", "phone", "email"];
 
@@ -20,6 +22,12 @@ function isLeadField(value: string): value is keyof LeadRequest {
 
 function replaceResultAt(results: CsvRowResult[], index: number, result: CsvRowResult): CsvRowResult[] {
   return results.map((entry, i) => (i === index ? result : entry));
+}
+
+function validateLeadRequest(leadRequest: LeadRequest): string[] | null {
+  const result = leadSchema.safeParse(leadRequest);
+  if (result.success) return null;
+  return result.error.issues.map((issue) => issue.message);
 }
 
 function useCsvImport() {
@@ -55,11 +63,19 @@ function useCsvImport() {
     setLeadResponse(leadRequests.map((leadRequest) => ({ status: "sending", leadRequest })));
 
     await Promise.all(leadRequests.map(async (leadRequest, index) => {
-      const result = await sendLeadRequest(leadRequest);
+      const result = await processLeadRequest(leadRequest);
       setLeadResponse((prev) => replaceResultAt(prev, index, result));
     }));
 
     await getLeads();
+  }
+
+  async function processLeadRequest(leadRequest: LeadRequest): Promise<CsvRowResult> {
+    const messages = validateLeadRequest(leadRequest);
+    if (messages) {
+      return { status: "error", leadRequest, reason: "validation", messages };
+    }
+    return sendLeadRequest(leadRequest);
   }
 
   async function sendLeadRequest(leadRequest: LeadRequest): Promise<CsvRowResult> {
@@ -68,7 +84,7 @@ function useCsvImport() {
       return { status: "success", lead: data };
     } catch (error) {
       console.error(error);
-      return { status: "error", leadRequest };
+      return { status: "error", leadRequest, reason: "server" };
     }
   }
 

@@ -2,7 +2,7 @@ import type { Lead } from "../types/Lead.ts";
 import {createContext, type ReactNode, useContext, useState} from "react";
 import { api } from "../api/axiosInstance.ts";
 import type { CallLog } from "../types/CallLog.ts";
-import type { LeadFormValues } from "../schemas/leadFormSchema.ts";
+import type { LeadFormValues } from "../schemas/leadSchema.ts";
 
 interface LeadContextType {
   leads: Lead[],

@@ -2,7 +2,7 @@ import "./AddLead.css";
 import { useLeads } from "../context/LeadContext.tsx";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { leadFormSchema, type LeadFormValues } from "../schemas/leadFormSchema.ts";
+import { leadSchema, type LeadFormValues } from "../schemas/leadSchema.ts";
 import { useNavigate } from "react-router-dom";
 import FieldError from "./FieldError.tsx";
 
@@ -15,7 +15,7 @@ export default function AddLead() {
     handleSubmit,
     formState: { errors },
   } = useForm<LeadFormValues>({
-    resolver: zodResolver(leadFormSchema),
+    resolver: zodResolver(leadSchema),
     defaultValues: {
       firstname: "",
       lastname: "",

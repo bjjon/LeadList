@@ -99,7 +99,8 @@ export default function CsvImport() {
                   <span>
                     {result.status === "sending" && "Wird gesendet…"}
                     {result.status === "success" && "Erfolgreich importiert"}
-                    {result.status === "error" && "Fehler beim Import"}
+                    {result.status === "error" && result.reason === "server" && "Fehler beim Import"}
+                    {result.status === "error" && result.reason === "validation" && result.messages.join(", ")}
                   </span>
                 </li>
               ))}
