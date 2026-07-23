@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 import SearchBar from "../components/SearchBar.tsx";
 import {useEffect, useMemo, useState} from "react";
 import AddLead from "../components/AddLead.tsx";
+import CsvImport from "../components/CsvImport.tsx";
 
 export default function Dashboard() {
   const { leads, getLeads } = useLeads();
@@ -42,6 +43,7 @@ export default function Dashboard() {
             </>
           } />
           <Route path={"/add"} element={<AddLead />} />
+          <Route path={"/csv"} element={<CsvImport />} />
         </Routes>
       </div>
     </div>
