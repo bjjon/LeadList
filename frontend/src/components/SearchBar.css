@@ -50,3 +50,175 @@
 .search-input::placeholder {
     color: var(--ink-500);
 }
+
+/* ── Active filter chips ── */
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.25rem 0.2rem 0.5rem;
+    border-radius: 9999px;
+    background: var(--ink-700);
+    border: 1px solid var(--ink-600);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+}
+
+.filter-chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.filter-chip-avatar {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--ink-950);
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.filter-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    color: var(--text-muted);
+    padding: 0;
+    transition: color 0.1s, background 0.1s;
+}
+
+.filter-chip-remove svg {
+    width: 0.625rem;
+    height: 0.625rem;
+}
+
+.filter-chip-remove:hover {
+    color: var(--text-primary);
+    background: var(--ink-500);
+}
+
+/* ── Autocomplete panel ── */
+.ac-panel {
+    position: absolute;
+    top: calc(100% + 0.375rem);
+    left: 0;
+    right: 0;
+    background: var(--ink-800);
+    border: 1px solid var(--ink-700);
+    border-radius: 0.5rem;
+    padding: 0.375rem;
+    z-index: 50;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.12s ease-out;
+}
+
+.ac-group + .ac-group {
+    margin-top: 0.25rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--ink-700);
+}
+
+.ac-label {
+    font-family: var(--font-mono), serif;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    padding: 0.25rem 0.375rem 0.375rem;
+}
+
+/* ── Badge row (Status + Mitarbeiter) ── */
+.ac-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    padding: 0 0.25rem 0.25rem;
+}
+
+.ac-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3rem 0.625rem;
+    border-radius: 9999px;
+    border: 1px solid var(--ink-700);
+    background: transparent;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    transition: border-color 0.12s, background 0.12s, color 0.12s;
+}
+
+.ac-badge:hover {
+    border-color: var(--ink-600);
+    background: var(--ink-700);
+    color: var(--text-primary);
+}
+
+.ac-badge--on {
+    border-color: var(--accent);
+    background: rgba(125, 211, 252, 0.08);
+    color: var(--text-primary);
+}
+
+/* Status dot inside badge */
+.ac-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Mitarbeiter avatar inside badge */
+.ac-badge-avatar {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 50%;
+    background: var(--ink-600);
+    border: 1px solid var(--ink-500);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5625rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    position: relative;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+/* presence dot on avatar corner */
+.ac-badge-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--ink-500);
+    border: 1px solid var(--ink-800);
+    transition: background 0.15s;
+}
+
+.ac-badge-avatar--active {
+    background: rgba(125, 211, 252, 0.12);
+    border-color: rgba(125, 211, 252, 0.3);
+    color: var(--accent);
+}
+
+.ac-badge-avatar--active::after {
+    background: var(--accent-ok);
+}
