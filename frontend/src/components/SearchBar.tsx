@@ -1,6 +1,6 @@
 import "./SearchBar.css";
 import type { Status } from "../types/Status.ts";
-import useOutsideClick from "../hooks/OutsideClick.ts";
+import useOutsideClick from "../hooks/useOutsideClick.ts";
 import { useState } from "react";
 
 type SearchBarType = {
