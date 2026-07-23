@@ -14,6 +14,13 @@ export default function CsvImport() {
     fileInputRef.current?.click();
   }
 
+  function handleZoneKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  }
+
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
 
@@ -56,6 +63,7 @@ export default function CsvImport() {
         <div
           className={`drop-zone${isDragging ? " dragover" : ""}${hasInvalidType ? " drop-zone--danger" : ""}`}
           onClick={handleZoneClick}
+          onKeyDown={handleZoneKeyDown}
           onDragOver={handleDragOver}
           onDragEnter={handleDragOver}
           onDragLeave={handleDragLeave}
