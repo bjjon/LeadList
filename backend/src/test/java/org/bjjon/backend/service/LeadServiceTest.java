@@ -122,7 +122,7 @@ class LeadServiceTest {
     void getAll_mapsEntityFieldsToLeadResponseCorrectly() {
         when(leadRepo.findAll()).thenReturn(List.of(lead1));
 
-        LeadResponse result = leadService.getAll().get(0);
+        LeadResponse result = leadService.getAll().getFirst();
 
         assertEquals(lead1.getId(), result.id());
         assertEquals(lead1.getFirstname(), result.firstname());
