@@ -186,39 +186,15 @@
     width: 1.125rem;
     height: 1.125rem;
     border-radius: 50%;
-    background: var(--ink-600);
-    border: 1px solid var(--ink-500);
+    background: rgba(125, 211, 252, 0.2);
+    border: 1px solid rgba(125, 211, 252, 0.4);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 0.5625rem;
     font-weight: 700;
-    color: var(--text-muted);
+    color: var(--accent);
     flex-shrink: 0;
     position: relative;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-/* presence dot on avatar corner */
-.ac-badge-avatar::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--ink-500);
-    border: 1px solid var(--ink-800);
-    transition: background 0.15s;
-}
-
-.ac-badge-avatar--active {
-    background: rgba(125, 211, 252, 0.12);
-    border-color: rgba(125, 211, 252, 0.3);
-    color: var(--accent);
-}
-
-.ac-badge-avatar--active::after {
-    background: var(--accent-ok);
 }
