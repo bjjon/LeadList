@@ -1,10 +1,12 @@
 package org.bjjon.backend.exception;
 
 import org.bjjon.backend.exception.auth.AuthException;
+import org.bjjon.backend.exception.lead.DuplicatedLeadException;
 import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -47,6 +49,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrorMessage handleLeadNotAssignedException(LeadNotAssignedException ex) {
         return new ErrorMessage(ex.getMessage(), HttpStatus.FORBIDDEN.value(), Instant.now());
+    }
+
+    @ExceptionHandler(DuplicatedLeadException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handleDuplicatedLeadException(DuplicatedLeadException ex) {
+        return new ErrorMessage(ex.getMessage(), HttpStatus.CONFLICT.value(), Instant.now());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorMessage handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        return new ErrorMessage("This entry already exists", HttpStatus.CONFLICT.value(), Instant.now());
     }
 
     // todo - for testing populate message

@@ -4,7 +4,7 @@ CREATE TABLE lead (
     lastname     VARCHAR(255) NOT NULL,
     company      VARCHAR(255) NOT NULL,
     phone        VARCHAR(100) NOT NULL,
-    email        VARCHAR(100) NOT NULL,
+    email        VARCHAR(100) NOT NULL UNIQUE,
     note         VARCHAR(2000) DEFAULT '',
     status       VARCHAR(50) NOT NULL DEFAULT 'OPEN' REFERENCES status(value),
     created_by   UUID NOT NULL REFERENCES "user"(id),

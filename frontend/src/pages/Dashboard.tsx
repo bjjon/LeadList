@@ -19,7 +19,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     void getLeads();
-  }, [getLeads]);
+  }, []);
 
   const filteredLeads = useMemo(() => {
     const q = query.trim().toLowerCase();

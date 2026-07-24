@@ -8,6 +8,7 @@ import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
 import org.bjjon.backend.entity.Status;
 import org.bjjon.backend.entity.User;
+import org.bjjon.backend.exception.lead.DuplicatedLeadException;
 import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.bjjon.backend.repository.CallLogRepo;
@@ -30,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -364,5 +367,14 @@ class LeadServiceTest {
         assertEquals(leadRequest.phone(), leadResponse.phone());
         assertEquals(leadRequest.email(), leadResponse.email());
         assertEquals(leadRequest.note(), leadResponse.note());
+    }
+
+    @Test
+    void addLead_duplicateEmail_throwsDuplicatedLeadException() {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+        when(leadRepo.existsByEmail(leadRequest.email())).thenReturn(true);
+
+        assertThrows(DuplicatedLeadException.class, () -> leadService.addLead(user, leadRequest));
+        verify(leadRepo, never()).save(any());
     }
 }
