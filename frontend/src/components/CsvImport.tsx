@@ -1,7 +1,6 @@
 import "./CsvImport.css";
 import { useRef, useState } from "react";
 import useCsvImport from "../hooks/useCsvImport.ts";
-import { uuid } from "zod";
 
 export default function CsvImport() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,8 +96,8 @@ export default function CsvImport() {
               Fortschritt ({leadResponse.filter((r) => r.status !== "sending").length}/{leadResponse.length})
             </p>
             <ul className="csv-row-list">
-              {leadResponse.map((result) => (
-                <li key={uuid.toString()} className={`csv-row-status csv-row-status--${result.status}`}>
+              {leadResponse.map((result, index) => (
+                <li key={index} className={`csv-row-status csv-row-status--${result.status}`}>
                   <span>
                     {result.status === "success"
                       ? `${result.lead.firstname} ${result.lead.lastname}`
