@@ -60,7 +60,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorMessage handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        return new ErrorMessage("This entry already exists", HttpStatus.CONFLICT.value(), Instant.now());
+        return new ErrorMessage("Lead with this email already exists", HttpStatus.CONFLICT.value(), Instant.now());
     }
 
     // todo - for testing populate message
