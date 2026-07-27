@@ -4,21 +4,27 @@ import { useLeads } from "../context/LeadContext.tsx";
 import LeadList from "../components/LeadList.tsx";
 import { Route, Routes } from "react-router-dom";
 import SearchBar from "../components/SearchBar.tsx";
-import {useEffect, useMemo, useState} from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddLead from "../components/AddLead.tsx";
 import CsvImport from "../components/CsvImport.tsx";
+import useStatusFilter from "../hooks/useStatusFilter.ts";
+import useUsersFilter from "../hooks/useUsersFilter.ts";
 
 export default function Dashboard() {
   const { leads, getLeads } = useLeads();
   const [query, setQuery] = useState("");
+  const { statusFilters, availableStatus, toggleStatus } = useStatusFilter(query);
+  const { usersFilters, availableUser, toggleUser } = useUsersFilter(query);
 
   useEffect(() => {
-    getLeads();
+    void getLeads();
   }, []);
 
   const filteredLeads = useMemo(() => {
     const q = query.trim().toLowerCase();
     return leads.filter((lead) => {
+      if (statusFilters.length > 0 && !statusFilters.some((s) => s.value === lead.status?.value)) return false;
+      if (usersFilters.length > 0 && !usersFilters.some((u) => u.id === lead.assignedTo?.id)) return false;
       if (!q) return true;
       return (
         lead.firstname.toLowerCase().includes(q) ||
@@ -28,7 +34,7 @@ export default function Dashboard() {
         lead.email.toLowerCase().includes(q)
       );
     });
-  }, [leads, query]);
+  }, [leads, query, statusFilters, usersFilters]);
 
   return (
     <div className="app-screen">
@@ -38,7 +44,16 @@ export default function Dashboard() {
         <Routes>
           <Route index element={
             <>
-              <SearchBar query={query} onQueryChange={setQuery} />
+              <SearchBar
+                query={query}
+                onQueryChange={setQuery}
+                availableStatus={availableStatus}
+                statusFilters={statusFilters}
+                toggleStatus={toggleStatus}
+                availableUser={availableUser}
+                usersFilters={usersFilters}
+                toggleUser={toggleUser}
+              />
               <LeadList leads={filteredLeads} />
             </>
           } />

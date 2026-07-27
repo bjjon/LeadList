@@ -7,6 +7,7 @@ import org.bjjon.backend.dto.lead.LeadResponse;
 import org.bjjon.backend.entity.CallLog;
 import org.bjjon.backend.entity.Lead;
 import org.bjjon.backend.entity.User;
+import org.bjjon.backend.exception.lead.DuplicatedLeadException;
 import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.bjjon.backend.repository.CallLogRepo;
@@ -86,6 +87,10 @@ public class LeadService {
     }
 
     public LeadResponse addLead(User user, LeadRequest leadRequest) {
+
+        if (this.leadRepo.existsByEmail(leadRequest.email())) {
+            throw new DuplicatedLeadException(leadRequest.email());
+        }
 
         Lead newLead = new Lead();
 

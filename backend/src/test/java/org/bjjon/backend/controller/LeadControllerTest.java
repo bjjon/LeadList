@@ -10,6 +10,7 @@ import org.bjjon.backend.entity.Lead;
 import org.bjjon.backend.entity.Status;
 import org.bjjon.backend.entity.User;
 import org.bjjon.backend.config.WithMockUserSupportConfig;
+import org.bjjon.backend.exception.lead.DuplicatedLeadException;
 import org.bjjon.backend.exception.lead.LeadNotAssignedException;
 import org.bjjon.backend.service.LeadService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -365,6 +367,35 @@ class LeadControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(leadService, never()).addLead(any(), any());
+    }
+
+    @Test
+    void addLead_duplicateEmail_returns409() throws Exception {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+        when(leadService.addLead(eq(user), any(LeadRequest.class)))
+                .thenThrow(new DuplicatedLeadException(leadRequest.email()));
+
+        mockMvc.perform(post("/api/leads/add")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(leadRequest)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
+    }
+
+    @Test
+    void addLead_concurrentDuplicateEmail_returns409() throws Exception {
+        LeadRequest leadRequest = new LeadRequest("Max", "Mustermann", "Muster GmbH", "+49 179 223 223", "max@mail.de", "");
+        when(leadService.addLead(eq(user), any(LeadRequest.class)))
+                .thenThrow(new DataIntegrityViolationException("duplicate key value violates unique constraint \"lead_email_key\""));
+
+        mockMvc.perform(post("/api/leads/add")
+                        .with(authentication(new UsernamePasswordAuthenticationToken(user, null, List.of())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(leadRequest)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.message").value("Lead with this email already exists"));
     }
 
     @Test

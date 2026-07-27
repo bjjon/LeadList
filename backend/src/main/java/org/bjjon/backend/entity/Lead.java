@@ -46,7 +46,7 @@ public class Lead {
     @Column(name = "phone", nullable = false, length = 100)
     private String phone;
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;
 
     @Column(name = "note", length = 2000)

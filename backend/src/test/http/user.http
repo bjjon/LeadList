@@ -1,0 +1,3 @@
+### GET all users
+GET {{localhost}}:{{port}}/api/users
+Authorization: Bearer {{token}}

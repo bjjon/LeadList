@@ -1,7 +1,6 @@
 import "./CsvImport.css";
 import { useRef, useState } from "react";
 import useCsvImport from "../hooks/useCsvImport.ts";
-import { uuid } from "zod";
 
 export default function CsvImport() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -98,7 +97,7 @@ export default function CsvImport() {
             </p>
             <ul className="csv-row-list">
               {leadResponse.map((result) => (
-                <li key={uuid.toString()} className={`csv-row-status csv-row-status--${result.status}`}>
+                <li key={crypto.randomUUID()} className={`csv-row-status csv-row-status--${result.status}`}>
                   <span>
                     {result.status === "success"
                       ? `${result.lead.firstname} ${result.lead.lastname}`
