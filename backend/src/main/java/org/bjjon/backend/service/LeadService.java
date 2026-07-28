@@ -13,6 +13,7 @@ import org.bjjon.backend.exception.lead.LeadNotFountException;
 import org.bjjon.backend.repository.CallLogRepo;
 import org.bjjon.backend.repository.LeadRepo;
 import org.bjjon.backend.repository.StatusRepo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -22,14 +23,18 @@ import java.util.UUID;
 @Service
 public class LeadService {
 
+    private static final String TOPIC_LEADS = "/topic/leads";
+
     private final LeadRepo leadRepo;
     private final CallLogRepo callLogRepo;
     private final StatusRepo statusRepo;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public LeadService(LeadRepo leadRepo, CallLogRepo callLogRepo, StatusRepo statusRepo) {
+    public LeadService(LeadRepo leadRepo, CallLogRepo callLogRepo, StatusRepo statusRepo, SimpMessagingTemplate messagingTemplate) {
         this.leadRepo = leadRepo;
         this.callLogRepo = callLogRepo;
         this.statusRepo = statusRepo;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public List<LeadResponse> getAll() {
@@ -52,7 +57,9 @@ public class LeadService {
         lead.setStatus(statusRepo.findStatusByValue("IN_PROGRESS"));
         leadRepo.save(lead);
 
-        return LeadResponse.fromEntity(lead);
+        LeadResponse response = LeadResponse.fromEntity(lead);
+        messagingTemplate.convertAndSend(TOPIC_LEADS, response);
+        return response;
     }
 
     public LeadResponse unassign(UUID id) {
@@ -62,7 +69,9 @@ public class LeadService {
         lead.setStatus(statusRepo.findStatusByValue("OPEN"));
         leadRepo.save(lead);
 
-        return LeadResponse.fromEntity(lead);
+        LeadResponse response = LeadResponse.fromEntity(lead);
+        messagingTemplate.convertAndSend(TOPIC_LEADS, response);
+        return response;
     }
 
     public LeadResponse logCall(User user, UUID id, CallLogRequest callLogRequest) {
@@ -83,7 +92,10 @@ public class LeadService {
         lead.setStatus(statusRepo.findStatusByValue(callLogRequest.result().name()));
         leadRepo.save(lead);
 
-        return LeadResponse.fromEntity(lead);
+        LeadResponse response = LeadResponse.fromEntity(lead);
+        messagingTemplate.convertAndSend(TOPIC_LEADS, response);
+
+        return response;
     }
 
     public LeadResponse addLead(User user, LeadRequest leadRequest) {
@@ -105,6 +117,9 @@ public class LeadService {
 
         leadRepo.save(newLead);
 
-        return LeadResponse.fromEntity(newLead);
+        LeadResponse response = LeadResponse.fromEntity(newLead);
+        messagingTemplate.convertAndSend(TOPIC_LEADS, response);
+
+        return response;
     }
 }

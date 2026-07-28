@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -75,6 +76,12 @@ class SecurityConfigIntegrationTest {
         mockMvc.perform(post("/api/auth/login")
                         .contentType("application/json")
                         .content("{}"))
+                .andExpect(status().is(not(401)));
+    }
+
+    @Test
+    void wsHandshakeEndpoint_isPermitAll_soItIsReachableWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/ws/info"))
                 .andExpect(status().is(not(401)));
     }
 

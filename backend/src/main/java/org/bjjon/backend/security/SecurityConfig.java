@@ -30,10 +30,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .anyRequest().authenticated())
+                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/ws/**").permitAll()
+                    .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(restAuthenticationEntryPoint))
+                    .authenticationEntryPoint(restAuthenticationEntryPoint))
                 .addFilterAfter(jwtAuthenticationFilter, ExceptionTranslationFilter.class)
                 .build();
     }

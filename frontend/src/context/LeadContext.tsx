@@ -13,6 +13,7 @@ interface LeadContextType {
   unassign: (id: string) => Promise<void>;
   logCall: (id: string, payload: { result: string, notes: string }) => Promise<void>;
   addLead: (payload: LeadFormValues) => Promise<void>;
+  upsertLead: (lead: Lead) => void;
 }
 
 const LeadContext = createContext<LeadContextType | null>(null);
@@ -76,9 +77,17 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
     }
   }
 
+  const upsertLead = (updated: Lead) => {
+    setLeads(prev => {
+      const exists = prev.some(lead => lead.id === updated.id);
+      return exists
+        ? prev.map(lead => lead.id === updated.id ? updated : lead)
+        : [updated, ...prev];
+    });
+  }
 
   return (
-    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall, addLead }} >
+    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall, addLead, upsertLead }} >
       {children}
     </LeadContext.Provider>
   )
