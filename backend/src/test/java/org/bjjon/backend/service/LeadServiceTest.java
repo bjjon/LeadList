@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -333,7 +332,7 @@ class LeadServiceTest {
         assertEquals(user, savedCallLog.getUser());
         assertEquals(CallLog.CallResult.REACHED, savedCallLog.getResult());
         assertEquals("Kunde erreicht, Rückruf vereinbart", savedCallLog.getNotes());
-        verify(messagingTemplate, never()).convertAndSend(anyString(), any(Object.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
     }
 
     @Test
@@ -387,7 +386,7 @@ class LeadServiceTest {
 
         assertEquals(user.getId(), leadResponse.createdBy().id());
         assertEquals("OPEN", leadResponse.status().value());
-        verify(messagingTemplate, never()).convertAndSend(anyString(), any(Object.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
     }
 
     @Test
