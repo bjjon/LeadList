@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.time.Instant;
 import java.util.List;
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +50,9 @@ class LeadServiceTest {
     @Mock
     private StatusRepo statusRepo;
 
+    @Mock
+    private SimpMessagingTemplate messagingTemplate;
+
     @InjectMocks
     private LeadService leadService;
 
@@ -57,7 +62,7 @@ class LeadServiceTest {
 
     @BeforeEach
     void setUp() {
-        leadService = new LeadService(leadRepo, callLogRepo,  statusRepo);
+        leadService = new LeadService(leadRepo, callLogRepo, statusRepo, messagingTemplate);
         Status status = Status.builder()
                 .value("OPEN")
                 .label("Offen")
@@ -219,6 +224,22 @@ class LeadServiceTest {
     }
 
     @Test
+    void assign_existingLead_broadcastsLeadResponseToTopicLeads() {
+        Status inProgressStatus = Status.builder()
+                .value("IN_PROGRESS")
+                .label("In Bearbeitung")
+                .color("#fbbf24")
+                .build();
+
+        when(leadRepo.findById(lead1.getId())).thenReturn(Optional.of(lead1));
+        when(statusRepo.findStatusByValue("IN_PROGRESS")).thenReturn(inProgressStatus);
+
+        leadService.assign(user, lead1.getId());
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
+    }
+
+    @Test
     void assign_leadNotFound_throwsLeadNotFountException() {
         UUID unknownId = UUID.randomUUID();
         when(leadRepo.findById(unknownId)).thenReturn(Optional.empty());
@@ -264,6 +285,23 @@ class LeadServiceTest {
     }
 
     @Test
+    void unassign_existingLead_broadcastsLeadResponseToTopicLeads() {
+        Status openStatus = Status.builder()
+                .value("OPEN")
+                .label("Offen")
+                .color("#64748b")
+                .build();
+        lead1.setAssignedTo(user);
+
+        when(leadRepo.findById(lead1.getId())).thenReturn(Optional.of(lead1));
+        when(statusRepo.findStatusByValue("OPEN")).thenReturn(openStatus);
+
+        leadService.unassign(lead1.getId());
+
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
+    }
+
+    @Test
     void unassign_leadNotFound_throwsLeadNotFountException() {
         UUID unknownId = UUID.randomUUID();
         when(leadRepo.findById(unknownId)).thenReturn(Optional.empty());
@@ -294,6 +332,7 @@ class LeadServiceTest {
         assertEquals(user, savedCallLog.getUser());
         assertEquals(CallLog.CallResult.REACHED, savedCallLog.getResult());
         assertEquals("Kunde erreicht, Rückruf vereinbart", savedCallLog.getNotes());
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
     }
 
     @Test
@@ -347,6 +386,7 @@ class LeadServiceTest {
 
         assertEquals(user.getId(), leadResponse.createdBy().id());
         assertEquals("OPEN", leadResponse.status().value());
+        verify(messagingTemplate).convertAndSend(eq("/topic/leads"), any(LeadResponse.class));
     }
 
     @Test
