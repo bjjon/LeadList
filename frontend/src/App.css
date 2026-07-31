@@ -51,6 +51,13 @@ button {
     background: none;
     color: inherit;
 }
+/* Firefox adds an extra inner focus border/padding on buttons that the
+   *, *::before, *::after reset above doesn't reach, shifting button content
+   slightly compared to Chrome. */
+button::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
 input,
 select,
 textarea {

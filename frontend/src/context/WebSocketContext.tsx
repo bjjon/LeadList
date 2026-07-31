@@ -3,7 +3,9 @@ import { Client, type IMessage } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { useAuthStore } from "../store/authStore.ts";
 import { useLeads } from "./LeadContext.tsx";
+import { useUsers } from "./UserContext.tsx";
 import type { Lead } from "../types/Lead.ts";
+import type { User } from "../types/User.ts";
 
 interface WebSocketContextType {
   connected: boolean;
@@ -14,11 +16,22 @@ const WebSocketContext = createContext<WebSocketContextType | null>(null);
 function WebSocketProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [connected, setConnected] = useState(false);
   const { upsertLead } = useLeads();
+  const { upsertUser, getUsers } = useUsers();
   const token = useAuthStore(s => s.token);
 
   const upsertLeadRef = useRef(upsertLead);
   useEffect(() => {
     upsertLeadRef.current = upsertLead;
+  });
+
+  const upsertUserRef = useRef(upsertUser);
+  useEffect(() => {
+    upsertUserRef.current = upsertUser;
+  });
+
+  const getUsersRef = useRef(getUsers);
+  useEffect(() => {
+    getUsersRef.current = getUsers;
   });
 
   useEffect(() => {
@@ -36,6 +49,11 @@ function WebSocketProvider({ children }: Readonly<{ children: ReactNode }>) {
           const lead: Lead = JSON.parse(message.body);
           upsertLeadRef.current(lead);
         });
+        client.subscribe("/topic/users", (message: IMessage) => {
+          const user: User = JSON.parse(message.body);
+          upsertUserRef.current(user);
+        });
+        void getUsersRef.current();
       },
       onStompError: () => setConnected(false),
       onWebSocketClose: () => setConnected(false),

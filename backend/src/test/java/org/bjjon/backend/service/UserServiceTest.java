@@ -23,6 +23,9 @@ class UserServiceTest {
     @Mock
     private UserRepo userRepo;
 
+    @Mock
+    private UserPresenceService userPresenceService;
+
     @InjectMocks
     private UserService userService;
 
@@ -78,5 +81,25 @@ class UserServiceTest {
         assertEquals(user1.getId(), result.id());
         assertEquals(user1.getFirstname(), result.firstname());
         assertEquals(user1.getLastname(), result.lastname());
+    }
+
+    @Test
+    void getAll_userOnline_mapsOnlineTrue() {
+        when(userRepo.findAll()).thenReturn(List.of(user1));
+        when(userPresenceService.isOnline(USER1_UUID)).thenReturn(true);
+
+        UserResponse result = userService.getAll().getFirst();
+
+        assertTrue(result.online());
+    }
+
+    @Test
+    void getAll_userOffline_mapsOnlineFalse() {
+        when(userRepo.findAll()).thenReturn(List.of(user1));
+        when(userPresenceService.isOnline(USER1_UUID)).thenReturn(false);
+
+        UserResponse result = userService.getAll().getFirst();
+
+        assertFalse(result.online());
     }
 }

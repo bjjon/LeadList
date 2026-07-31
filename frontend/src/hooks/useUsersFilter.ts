@@ -1,9 +1,9 @@
-import { api } from "../api/axiosInstance.ts";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useState} from "react";
 import type { User } from "../types/User.ts";
+import { useUsers } from "../context/UserContext.tsx";
 
 function useUsersFilter(query: string) {
-  const [users, setUsers] = useState<User[]>([]);
+  const { users, getUsers } = useUsers();
   const [usersFilters, setUsersFilters] = useState<User[]>([]);
   const matchedUser: User[] = getMatchedUser(query);
 
@@ -26,20 +26,9 @@ function useUsersFilter(query: string) {
     );
   }, []);
 
-  useEffect(() => {
-    void getAllUsers();
-  }, []);
+  const liveUsersFilters = usersFilters.map((f) => users.find((u) => u.id === f.id) ?? f);
 
-  async function getAllUsers(): Promise<void> {
-    try {
-      const { data } = await api.get<User[]>('users');
-      setUsers(data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  return { usersFilters, matchedUser, availableUser, getMatchedUser, getAllUsers, toggleUser };
+  return { usersFilters: liveUsersFilters, matchedUser, availableUser, getMatchedUser, getAllUsers: getUsers, toggleUser };
 }
 
 export default useUsersFilter;

@@ -5,18 +5,22 @@
     top: 0;
     z-index: 20;
     padding: 1rem 1.5rem;
+    height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    overflow: hidden;
 }
 #pageTitle {
     font-weight: 700;
     font-size: 1.125rem;
+    line-height: 1.2;
 }
 #pageSubtitle {
     font-family: var(--font-mono), serif;
     font-size: 0.7rem;
+    line-height: 1.2;
     color: var(--text-muted);
     margin-top: 0.2rem;
 }
