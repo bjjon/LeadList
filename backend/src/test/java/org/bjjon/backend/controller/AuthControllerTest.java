@@ -49,7 +49,7 @@ class AuthControllerTest {
 
     @Test
     void login_validRequest_returns200WithLoginResponse() throws Exception {
-        UserResponse userResponse = new UserResponse(UUID.randomUUID(), "Max", "Mustermann");
+        UserResponse userResponse = new UserResponse(UUID.randomUUID(), "Max", "Mustermann", false);
         when(authService.login(EMAIL, RAW_PASSWORD))
                 .thenReturn(new LoginResponse("test-token", userResponse));
 

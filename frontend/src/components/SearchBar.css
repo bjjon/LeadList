@@ -74,6 +74,7 @@
 }
 
 .filter-chip-avatar {
+    position: relative;
     width: 1rem;
     height: 1rem;
     border-radius: 50%;
@@ -85,6 +86,25 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+/* Presence indicator overlaid on a user avatar */
+.presence-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-800);
+}
+
+.presence-dot--online {
+    background: #22c55e;
+}
+
+.presence-dot--offline {
+    background: var(--ink-500);
 }
 
 .filter-chip-remove {

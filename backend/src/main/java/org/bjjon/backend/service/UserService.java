@@ -10,12 +10,16 @@ import java.util.List;
 public class UserService {
 
     private final UserRepo userRepo;
+    private final UserPresenceService userPresenceService;
 
-    public UserService(UserRepo userRepo) {
+    public UserService(UserRepo userRepo, UserPresenceService userPresenceService) {
         this.userRepo = userRepo;
+        this.userPresenceService = userPresenceService;
     }
 
     public List<UserResponse> getAll() {
-        return userRepo.findAll().stream().map(UserResponse::fromEntity).toList();
+        return userRepo.findAll().stream()
+                .map(user -> UserResponse.fromEntity(user, userPresenceService.isOnline(user.getId())))
+                .toList();
     }
 }

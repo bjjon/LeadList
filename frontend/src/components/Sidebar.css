@@ -91,7 +91,8 @@
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    min-height: 70px;
+    height: 70px;
+    overflow: hidden;
 }
 .sidebar-logo {
     width: 2rem;
@@ -113,10 +114,12 @@
 .sidebar-title {
     font-weight: 700;
     font-size: 0.875rem;
+    line-height: 1.2;
 }
 #statsLabel {
     font-family: var(--font-mono), serif;
     font-size: 0.7rem;
+    line-height: 1.2;
     color: var(--text-muted);
     margin-top: 0.2rem;
 }

@@ -2,6 +2,8 @@ import './Sidebar.css';
 import { useAuthStore } from "../store/authStore.ts";
 import { logout as logoutRequest } from "../api/auth.ts";
 import { NavLink } from "react-router-dom";
+import { useWebSocket } from "../context/WebSocketContext.tsx";
+import { useUsers } from "../context/UserContext.tsx";
 
 export default function Sidebar() {
   const toggleSidebar = () => {
@@ -10,6 +12,9 @@ export default function Sidebar() {
   };
 
   const { user, logout } = useAuthStore();
+  const { connected } = useWebSocket();
+  const { users } = useUsers();
+  const onlineCount = users.filter((u) => u.online).length;
 
   async function handleLogout() {
     try {
@@ -34,7 +39,7 @@ export default function Sidebar() {
         </button>
         <div className="sb-text">
           <div className="sidebar-title">Telefonliste</div>
-          <div id="statsLabel">0 von 0 aktiv</div>
+          <div id="statsLabel">{onlineCount} von {users.length} aktiv</div>
         </div>
         <button
           id="sidebarToggle"
@@ -117,7 +122,7 @@ export default function Sidebar() {
           <span className="sb-text">Abmelden</span>
         </button>
         <div className="user-chip">
-          <div className="avatar" id="userAvatar">
+          <div className={`avatar${connected ? " avatar--active" : ""}`} id="userAvatar">
             {user?.firstname.charAt(0)}{user?.lastname.charAt(0)}
           </div>
           <span id="userLabel" className="sb-text">

@@ -58,7 +58,10 @@ export default function SearchBar({ query, onQueryChange, availableStatus, statu
 
           {[...usersFilters].map((u) => (
             <span key={u.id} className="filter-chip filter-chip--assignee">
-              <span className="filter-chip-avatar">{u.firstname.charAt(0)}{u.lastname.charAt(0)}</span>
+              <span className="filter-chip-avatar">
+                {u.firstname.charAt(0)}{u.lastname.charAt(0)}
+                <span className={`presence-dot ${u.online ? "presence-dot--online" : "presence-dot--offline"}`} />
+              </span>
               {u.firstname} {u.lastname}
               <button
                 className="filter-chip-remove"
@@ -123,6 +126,7 @@ export default function SearchBar({ query, onQueryChange, availableStatus, statu
                         >
                         <span className="ac-badge-avatar">
                           {u.firstname.charAt(0)}{u.lastname.charAt(0)}
+                          <span className={`presence-dot ${u.online ? "presence-dot--online" : "presence-dot--offline"}`} />
                         </span>
                           {u.firstname} {u.lastname}
                         </button>
