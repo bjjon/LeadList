@@ -68,15 +68,6 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
     }
   }
 
-  const addLead = async (payload: LeadFormValues) => {
-    try {
-      const { data } =  await api.post<Lead>('leads/add', payload);
-      setLeads(prev => [data, ...prev]);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   const upsertLead = (updated: Lead) => {
     setLeads(prev => {
       const exists = prev.some(lead => lead.id === updated.id);
@@ -84,6 +75,15 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
         ? prev.map(lead => lead.id === updated.id ? updated : lead)
         : [updated, ...prev];
     });
+  }
+
+  const addLead = async (payload: LeadFormValues) => {
+    try {
+      const { data } =  await api.post<Lead>('leads/add', payload);
+      upsertLead(data);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
