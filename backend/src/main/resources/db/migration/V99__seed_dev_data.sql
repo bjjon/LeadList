@@ -1,7 +1,7 @@
 INSERT INTO "user" (id, firstname, lastname, email, password, created_at) VALUES
-    ('4994802c-b652-4431-8b27-921e76093284', 'Max', 'Mustermann',  'max@example.com',    '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '30 days'),
-    ('8b5d9619-0acb-457b-8594-ae20db513cdc', 'Lisa','Schneider',  'lisa@example.com',   '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '25 days'),
-    ('28515cdb-370f-466f-bf95-e0042e07e540', 'Tom', 'Fischer',     'tom@example.com',    '$2a$12$13QTcucQJcSo2DwSntr9OOQYpB8DvHgph//LO.XfunnFZxPLACTzS', NOW() - INTERVAL '20 days')
+    ('4994802c-b652-4431-8b27-921e76093284', 'Max', 'Mustermann',  'max@example.com',    '$2b$12$Kw7uEsc9D0PqMXfnnpeHI./J0oT2.utO7Y4FmLvtkVR6iD3KuUhfG', NOW() - INTERVAL '30 days'),
+    ('8b5d9619-0acb-457b-8594-ae20db513cdc', 'Lisa','Schneider',  'lisa@example.com',   '$2b$12$Kw7uEsc9D0PqMXfnnpeHI./J0oT2.utO7Y4FmLvtkVR6iD3KuUhfG', NOW() - INTERVAL '25 days'),
+    ('28515cdb-370f-466f-bf95-e0042e07e540', 'Tom', 'Fischer',     'tom@example.com',    '$2b$12$Kw7uEsc9D0PqMXfnnpeHI./J0oT2.utO7Y4FmLvtkVR6iD3KuUhfG', NOW() - INTERVAL '20 days')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO lead (id, firstname, lastname, company, phone, email, status, created_by, assigned_to, created_at, updated_at) VALUES
