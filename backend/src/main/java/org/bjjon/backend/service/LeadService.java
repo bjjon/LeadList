@@ -24,6 +24,7 @@ import java.util.UUID;
 public class LeadService {
 
     private static final String TOPIC_LEADS = "/topic/leads";
+    private static final String TOPIC_CALL_LOGS = "/topic/call-logs";
 
     private final LeadRepo leadRepo;
     private final CallLogRepo callLogRepo;
@@ -88,6 +89,7 @@ public class LeadService {
                 .notes(callLogRequest.notes())
                 .build();
         callLogRepo.save(callLog);
+        messagingTemplate.convertAndSend(TOPIC_CALL_LOGS, CallLogResponse.fromEntity(callLog));
 
         lead.setStatus(statusRepo.findStatusByValue(callLogRequest.result().name()));
         leadRepo.save(lead);
