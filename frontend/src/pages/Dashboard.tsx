@@ -7,6 +7,7 @@ import SearchBar from "../components/SearchBar.tsx";
 import { useEffect, useMemo, useState } from "react";
 import AddLead from "../components/AddLead.tsx";
 import CsvImport from "../components/CsvImport.tsx";
+import Chat from "../components/Chat.tsx";
 import useStatusFilter from "../hooks/useStatusFilter.ts";
 import useUsersFilter from "../hooks/useUsersFilter.ts";
 
@@ -59,6 +60,7 @@ export default function Dashboard() {
           } />
           <Route path={"/add"} element={<AddLead />} />
           <Route path={"/csv"} element={<CsvImport />} />
+          <Route path={"/chat"} element={<Chat />} />
         </Routes>
       </div>
     </div>
