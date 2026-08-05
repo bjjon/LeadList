@@ -1,6 +1,7 @@
 import type { User } from "../types/User.ts";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { api } from "../api/axiosInstance.ts";
+import { useAuthStore } from "../store/authStore.ts";
 
 interface UserContextType {
   users: User[],
@@ -12,6 +13,7 @@ const UserContext = createContext<UserContextType | null>(null);
 
 function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [users, setUsers] = useState<User[]>([]);
+  const token = useAuthStore(s => s.token);
 
   const getUsers = async () => {
     try {
@@ -32,9 +34,12 @@ function UserProvider({ children }: Readonly<{ children: ReactNode }>) {
   }
 
   useEffect(() => {
+    if (!token) {
+      return;
+    }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void getUsers();
-  }, []);
+  }, [token]);
 
   return (
     <UserContext.Provider value={{ users, getUsers, upsertUser }}>

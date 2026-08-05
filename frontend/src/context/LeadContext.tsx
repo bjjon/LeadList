@@ -14,6 +14,7 @@ interface LeadContextType {
   logCall: (id: string, payload: { result: string, notes: string }) => Promise<void>;
   addLead: (payload: LeadFormValues) => Promise<void>;
   upsertLead: (lead: Lead) => void;
+  appendCallLog: (log: CallLog) => void;
 }
 
 const LeadContext = createContext<LeadContextType | null>(null);
@@ -21,6 +22,7 @@ const LeadContext = createContext<LeadContextType | null>(null);
 function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [logs, setLogs] = useState<CallLog[]>([]);
+  const [currentLeadId, setCurrentLeadId] = useState<string | null>(null);
 
   const getLeads = async () => {
     try {
@@ -34,10 +36,19 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
   const getCallLogs = async (id: string) => {
     try {
       const { data } = await api.get<CallLog[]>(`/leads/${id}/call-logs`);
+      setCurrentLeadId(id);
       setLogs(data);
     } catch (error) {
       console.error(error);
     }
+  }
+
+  const appendCallLog = (log: CallLog) => {
+    setLogs(prev => {
+      if (log.leadId !== currentLeadId) return prev;
+      if (prev.some(existing => existing.id === log.id)) return prev;
+      return [...prev, log];
+    });
   }
 
   const assign = async (id: string) => {
@@ -87,7 +98,7 @@ function LeadProvider({ children }: Readonly<{ children: ReactNode }>) {
   }
 
   return (
-    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall, addLead, upsertLead }} >
+    <LeadContext.Provider value={{ leads, getLeads, logs, getCallLogs, assign, unassign, logCall, addLead, upsertLead, appendCallLog }} >
       {children}
     </LeadContext.Provider>
   )

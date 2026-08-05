@@ -199,7 +199,7 @@ export default function LeadDetail({ lead, isOpen, onClose }: Readonly<LeadDetai
                 ) : (
                   <ul className="history-list">
                     {logs.map((log) => (
-                      <li key={`${log.userId}-${log.calledAt}`} className="history-item">
+                      <li key={log.id} className="history-item">
                         <span className="history-time">{formatInstantTime(log.calledAt)}</span>
                         <span>
                           {log.result === "REACHED" ? "Als erreicht markiert." : "Als nicht erreicht markiert."}
