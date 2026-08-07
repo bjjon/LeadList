@@ -32,6 +32,7 @@
 }
 
 .chat-avatar {
+    position: relative;
     width: 1.75rem;
     height: 1.75rem;
     border-radius: 50%;
@@ -44,6 +45,23 @@
     font-weight: 700;
     color: var(--text-secondary);
     flex-shrink: 0;
+}
+
+.chat-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-600);
+    border: 1.5px solid var(--ink-900);
+    transition: background 0.2s;
+}
+
+.chat-avatar--online::after {
+    background: var(--accent-ok);
 }
 
 .chat-message-body {

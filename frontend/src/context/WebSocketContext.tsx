@@ -4,9 +4,11 @@ import SockJS from "sockjs-client";
 import { useAuthStore } from "../store/authStore.ts";
 import { useLeads } from "./LeadContext.tsx";
 import { useUsers } from "./UserContext.tsx";
+import { useChat } from "./ChatContext.tsx";
 import type { Lead } from "../types/Lead.ts";
 import type { User } from "../types/User.ts";
 import type { CallLog } from "../types/CallLog.ts";
+import type { ChatMessage } from "../types/ChatMessage.ts";
 
 interface WebSocketContextType {
   connected: boolean;
@@ -18,6 +20,7 @@ function WebSocketProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [connected, setConnected] = useState(false);
   const { upsertLead, appendCallLog } = useLeads();
   const { upsertUser, getUsers } = useUsers();
+  const { appendMessage } = useChat();
   const token = useAuthStore(s => s.token);
 
   const upsertLeadRef = useRef(upsertLead);
@@ -38,6 +41,11 @@ function WebSocketProvider({ children }: Readonly<{ children: ReactNode }>) {
   const appendCallLogRef = useRef(appendCallLog);
   useEffect(() => {
     appendCallLogRef.current = appendCallLog;
+  });
+
+  const appendMessageRef = useRef(appendMessage);
+  useEffect(() => {
+    appendMessageRef.current = appendMessage;
   });
 
   useEffect(() => {
@@ -62,6 +70,10 @@ function WebSocketProvider({ children }: Readonly<{ children: ReactNode }>) {
         client.subscribe("/topic/call-logs", (message: IMessage) => {
           const log: CallLog = JSON.parse(message.body);
           appendCallLogRef.current(log);
+        });
+        client.subscribe("/topic/chat-messages", (message: IMessage) => {
+          const chatMessage: ChatMessage = JSON.parse(message.body);
+          appendMessageRef.current(chatMessage);
         });
         void getUsersRef.current();
       },

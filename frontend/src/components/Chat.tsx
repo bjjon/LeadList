@@ -1,53 +1,33 @@
 import "./Chat.css";
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../store/authStore.ts";
+import { useChat } from "../context/ChatContext.tsx";
+import { useUsers } from "../context/UserContext.tsx";
 import formatInstantTime from "../utils/formatToLocalTime.ts";
-
-// Platzhalter-Nachrichten nur für den Layout-Entwurf.
-// Die echte Anbindung (Persistenz + WebSocket-Topic) folgt in einem separaten Schritt.
-type MockMessage = {
-  id: string;
-  author: string;
-  isOwn: boolean;
-  text: string;
-  sentAt: string;
-};
-
-function buildMockMessages(ownName: string): MockMessage[] {
-  const now = Date.now();
-  const minutesAgo = (m: number) => new Date(now - m * 60_000).toISOString();
-
-  return [
-    { id: "1", author: "Mia Keller", isOwn: false, text: "Hat schon jemand den Lead von Fischer & Söhne angerufen?", sentAt: minutesAgo(42) },
-    { id: "2", author: ownName, isOwn: true, text: "Ja, war heute Vormittag dran – noch nicht erreicht.", sentAt: minutesAgo(38) },
-    { id: "3", author: "Tom Bruns", isOwn: false, text: "Ich übernehm den Rückruf morgen früh.", sentAt: minutesAgo(35) },
-    { id: "4", author: "Mia Keller", isOwn: false, text: "Super, danke dir! 👍", sentAt: minutesAgo(34) },
-    { id: "5", author: ownName, isOwn: true, text: "Perfekt, ich trag das mal in den Verlauf ein.", sentAt: minutesAgo(12) },
-  ];
-}
+import * as React from "react";
 
 export default function Chat() {
   const { user } = useAuthStore();
-  const ownName = `${user?.firstname ?? "Du"} ${user?.lastname ?? ""}`.trim();
-
-  const [messages, setMessages] = useState<MockMessage[]>(() => buildMockMessages(ownName));
+  const { messages, getMessages, sendMessage } = useChat();
+  const { users } = useUsers();
   const [draft, setDraft] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void getMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
 
-  function handleSend(e: React.FormEvent) {
+  function handleSend(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    const text = draft.trim();
-    if (!text) return;
+    const content = draft.trim();
+    if (!content) return;
 
-    // Nur lokale Anzeige im Layout-Entwurf – kein Versand an Backend/WebSocket.
-    setMessages((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), author: ownName, isOwn: true, text, sentAt: new Date().toISOString() },
-    ]);
+    void sendMessage(content);
     setDraft("");
   }
 
@@ -55,16 +35,26 @@ export default function Chat() {
     <div id="page-chat" className="page-inner">
       <div className="chat-shell fade-in">
         <div className="chat-messages">
-          {messages.map((message) => (
-            <div key={message.id} className={`chat-message${message.isOwn ? " chat-message--own" : ""}`}>
-              {!message.isOwn && <div className="chat-avatar">{initials(message.author)}</div>}
-              <div className="chat-message-body">
-                {!message.isOwn && <span className="chat-message-author">{message.author}</span>}
-                <div className="chat-bubble">{message.text}</div>
-                <span className="chat-message-time">{formatInstantTime(message.sentAt)}</span>
+          {messages.map((message) => {
+            const isOwn = message.sender.id === user?.id;
+            const authorName = `${message.sender.firstname} ${message.sender.lastname}`.trim();
+            const isOnline = users.some(u => u.id === message.sender.id && u.online);
+
+            return (
+              <div key={message.id} className={`chat-message${isOwn ? " chat-message--own" : ""}`}>
+                {!isOwn && (
+                  <div className={`chat-avatar${isOnline ? " chat-avatar--online" : ""}`} title={isOnline ? "Online" : "Offline"}>
+                    {initials(authorName)}
+                  </div>
+                )}
+                <div className="chat-message-body">
+                  {!isOwn && <span className="chat-message-author">{authorName}</span>}
+                  <div className="chat-bubble">{message.content}</div>
+                  <span className="chat-message-time">{formatInstantTime(message.createdAt)}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
