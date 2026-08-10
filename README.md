@@ -70,11 +70,3 @@ cd frontend
 npm install
 npm run dev
 ```
-
-### Database migrations
-
-Schema changes are managed with Flyway (`backend/src/main/resources/db/migration`). Flyway validates
-the checksum of every already-applied migration on startup — **never edit a migration file that has
-already been merged/applied**, even for a tiny fix, since that breaks validation for anyone who already
-ran it and forces a full DB drop/recreate to get past it. Always add a new, additive migration
-(`V{next}__description.sql`) instead.
