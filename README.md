@@ -10,7 +10,7 @@
 
 ## Description
 
-LeadList is a collaborative lead management application. Employees jointly manage a shared list of leads: every lead can be assigned to individual team members, contact attempts are logged as call logs, and each lead is tagged with a defined status. Changes made by one team member (status updates, assignments) are pushed to everyone else in real time over WebSockets.
+LeadList is a collaborative lead management application. Employees jointly manage a shared list of leads: every lead can be assigned to individual team members, contact attempts are logged as call logs, and each lead is tagged with a defined status. Changes made by one team member (status updates, assignments) are pushed to everyone else in real time over WebSockets. A built-in team chat lets everyone communicate directly in the app.
 
 ## Features
 
@@ -20,7 +20,8 @@ LeadList is a collaborative lead management application. Employees jointly manag
 - **Status tracking** — leads move through a defined set of statuses (e.g. new, contacted, converted).
 - **CSV import** — bulk-import leads from a CSV file.
 - **Search & filtering** — search leads and filter by status or assigned user.
-- **Live updates** — lead changes and team members' online presence are broadcast in real time via WebSocket (STOMP over SockJS), so the list stays in sync across all connected clients without a page reload.
+- **Team chat** — a shared, persisted chat where every team member's messages are labeled with their name and online status, updated live for all connected clients.
+- **Live updates** — lead changes, chat messages, and team members' online presence are broadcast in real time via WebSocket (STOMP over SockJS), so the app stays in sync across all connected clients without a page reload.
 
 ## Tech Stack
 
@@ -39,8 +40,8 @@ LeadList is a collaborative lead management application. Employees jointly manag
 ## Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose, **or**
-- Java 25 + Maven and Node.js 22 + npm, to run backend/frontend individually
+- Docker and Docker Compose — always required (runs Postgres; optionally the full stack)
+- Additionally, to run backend/frontend individually instead of via Docker: Java 25 + Maven and Node.js 22 + npm
 
 ### Run the full stack with Docker Compose
 ```bash
@@ -50,7 +51,14 @@ docker compose up -d --build
 The app is then reachable via the nginx container on port 80.
 
 ### Run backend and frontend individually (development)
-Backend (reads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION` from the environment):
+Start Postgres via Docker first (`docker compose up -d postgres`, published on `localhost:5432` via
+`docker-compose.override.yml`), then run the backend against it.
+
+Backend (reads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION`
+from the environment — e.g. via an IDE run configuration that loads `.env`, or by exporting them in your
+shell). Unlike Docker Compose, where `DB_HOST`/`DB_PORT` are hardcoded to `postgres`/`5432` in
+`docker-compose.yaml`, a local/IDE run needs them set explicitly — use `DB_HOST=localhost` and
+`DB_PORT=5432` (see `.env.example`):
 ```bash
 cd backend
 ./mvnw spring-boot:run
@@ -62,3 +70,11 @@ cd frontend
 npm install
 npm run dev
 ```
+
+### Database migrations
+
+Schema changes are managed with Flyway (`backend/src/main/resources/db/migration`). Flyway validates
+the checksum of every already-applied migration on startup — **never edit a migration file that has
+already been merged/applied**, even for a tiny fix, since that breaks validation for anyone who already
+ran it and forces a full DB drop/recreate to get past it. Always add a new, additive migration
+(`V{next}__description.sql`) instead.
